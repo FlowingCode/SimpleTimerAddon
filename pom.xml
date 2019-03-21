@@ -4,7 +4,7 @@
 
     <groupId>com.flowingcode.addons</groupId>
     <artifactId>simple-timer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Simple Timer Addon</name>
     <description>Simple Timer for Vaadin 10</description>
     
@@ -20,7 +20,7 @@
         <url>https://github.com/FlowingCode/SimpleTimerAddon</url>
         <connection>scm:git:git://github.com/FlowingCode/SimpleTimerAddon.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:/FlowingCode/SimpleTimerAddon.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>simple-timer-1.0.0</tag>
     </scm>
 	
     <organization>
