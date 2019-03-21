@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
      *
      * @param startTime value in seconds for the start time
      */
-    public SimpleTimer(final BigDecimal startTime) {
+    public SimpleTimer(final Number startTime) {
         this();
         setStartTime(startTime);
     }
@@ -62,7 +62,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
      *
      * @param startTime value in seconds for the start time
      */
-    public void setStartTime(final BigDecimal startTime) {
+    public void setStartTime(final Number startTime) {
         getElement().setProperty("startTime", startTime.doubleValue());
         reset();
     }
