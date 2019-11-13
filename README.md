@@ -1,8 +1,8 @@
-[![Build Status](https://jenkins.flowingcode.com/job/SimpleTimer-addon/badge/icon)](https://jenkins.flowingcode.com/job/SimpleTimer-addon)
+[![Build Status](https://jenkins.flowingcode.com/job/SimpleTimer-14-addon/badge/icon)](https://jenkins.flowingcode.com/job/SimpleTimer-14-addon)
 
 # Simple Timer Addon
 
-Simple Timer for Vaadin 10 based on https://github.com/annsonn/simple-timer
+Simple Timer for Vaadin 10+ based on https://github.com/annsonn/simple-timer
 
 ## Online demo
 
@@ -17,7 +17,8 @@ To see the demo, navigate to http://localhost:8080/
 
 ## Release notes
 
-- **Version 1.0.0** Initial Version
+- **Version 1.0.0** Supports Vaadin 10-13 and Vaadin 14 in compatibility mode
+- **Version 2.0.0** Supports Vaadin 14 in npm mode
 
 ## Issue tracking
 

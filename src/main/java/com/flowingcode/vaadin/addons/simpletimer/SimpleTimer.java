@@ -31,16 +31,20 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Synchronize;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.HtmlImport;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
 
 /**
  * @author Leonardo Scardanzan / Flowing Code
  */
 @Tag("simple-timer")
-@HtmlImport("frontend://bower_components/simple-timer/simple-timer.html")
+@JsModule("./simple-timer/simple-timer.js")
 public class SimpleTimer extends Component implements HasSize, HasStyle {
 
-    /**
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a timer with a start time of 60
      */
     public SimpleTimer() {

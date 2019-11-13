@@ -4,25 +4,18 @@
 
     <groupId>com.flowingcode.addons</groupId>
     <artifactId>simple-timer</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>Simple Timer Addon</name>
-    <description>Simple Timer for Vaadin 10</description>
-    
+    <description>Simple Timer for Vaadin Flow</description>
+
     <properties>
-        <vaadin.version>10.0.0</vaadin.version>
+        <vaadin.version>14.0.12</vaadin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <jetty.version>9.4.15.v20190215</jetty.version>
     </properties>
-    
-	<scm>
-        <url>https://github.com/FlowingCode/SimpleTimerAddon</url>
-        <connection>scm:git:git://github.com/FlowingCode/SimpleTimerAddon.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:/FlowingCode/SimpleTimerAddon.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-	
     <organization>
        <name>Flowing Code</name>
        <url>https://www.flowingcode.com</url>
@@ -35,7 +28,14 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-        
+	
+	<scm>
+        <url>https://github.com/FlowingCode/SimpleTimerAddon</url>
+        <connection>scm:git:git://github.com/FlowingCode/SimpleTimerAddon.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:/FlowingCode/SimpleTimerAddon.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+	
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -53,63 +53,81 @@
             <id>Vaadin Directory</id>
             <url>https://maven.vaadin.com/vaadin-addons</url>
         </repository>
-        <repository>
-            <id>Vaadin prereleases</id>
-            <url>https://maven.vaadin.com/vaadin-prereleases</url>
-        </repository>
-        <!-- The bintray repository contain webjars immediately after generation. If the webjar is available
-             in Maven central, you do not need this repository 
-        <repository>
-            <id>webjars</id>
-            <url>https://dl.bintray.com/webjars/maven</url>
-        </repository>
-        -->
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
+            <exclusions>
+                <!-- Webjars are only needed when running in Vaadin 13 compatibility mode in V14.
+                     Your add-on can support npm in the same version mode and V13 compatiblity mode at the same time,
+                     or with separate versions. Any V13 version should work with the compatibility mode in V14. -->
+                <exclusion>
+                    <groupId>com.vaadin.webjar</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.insites</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.polymer</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.polymerelements</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.vaadin</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.webcomponents</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.webjars.bowergithub.annsonn</groupId>
-            <artifactId>simple-timer</artifactId>
-            <version>1.0.2</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
-                </plugin>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.3</version>
+				</plugin>
 				<plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.2</version>
                 </plugin>
-            </plugins>
-        </pluginManagement>
-        
+			</plugins>
+		</pluginManagement>
+		
         <plugins>
-						
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>1.14</version>
-                <configuration>
-                  <licenseName>apache_v2</licenseName>
-                  <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-                </configuration>
-            </plugin>
-    
+				
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.14</version>
+				<configuration>
+				  <licenseName>apache_v2</licenseName>
+				  <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+				</configuration>
+			</plugin>
+	
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.1.2</version>
                 <configuration>
                     <archive>
                         <index>true</index>
@@ -121,23 +139,42 @@
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
                         </manifestEntries>
                     </archive>
+					<!-- Generated file that shouldn't be included in add-ons -->
+					<excludes>
+						<exclude>META-INF/VAADIN/config/flow-build-info.json</exclude>
+					</excludes>					
                 </configuration>
             </plugin>
 
             <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-frontend</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.3.7.v20160115</version>
+                <version>${jetty.version}</version>
                 <configuration>
-                    <scanIntervalSeconds>-1</scanIntervalSeconds>
-                    <!-- Use test scope because the UI/demo classes are in 
-                        the test package. -->
+                    <scanIntervalSeconds>3</scanIntervalSeconds>
+                    <!-- Use test scope because the UI/demo classes are in
+                            the test package. -->
                     <useTestScope>true</useTestScope>
                     <webAppConfig>
                         <resourceBases>
-                            <resourceBase>src/test/resources/META-INF/resources</resourceBase>
-                        </resourceBases>
+	                        <resourceBase>src/test/resources/META-INF/resources</resourceBase>	                    
+	                    </resourceBases>
                     </webAppConfig>
+                    <supportedPackagings>
+                        <supportedPackaging>jar</supportedPackaging>
+                    </supportedPackagings>
                 </configuration>
             </plugin>
         </plugins>
@@ -202,6 +239,36 @@
                 </plugins>
             </build>
         </profile>
-    
+
+        <!-- Run (demo) in production mode-->
+        <profile>
+            <id>production</id>
+            <properties>
+                <vaadin.productionMode>true</vaadin.productionMode>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>flow-server-production-mode</artifactId>
+                </dependency>
+            </dependencies>
+            
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-frontend</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 </project>

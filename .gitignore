@@ -1,5 +1,9 @@
-/.project
 /.settings
 /target
 /.classpath
-/bin
+/.project
+/node_modules
+/webpack.generated.js
+/node
+/package.json
+/package-lock.json
