@@ -83,21 +83,21 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
      * Starts or stops the timer if it is already started
      */
     public void start() {
-        getElement().callFunction("start");
+        getElement().callJsFunction("start");
     }
 
     /**
      * Stops the timer, does nothing if already stopped
      */
     public void pause() {
-        getElement().callFunction("pause");
+        getElement().callJsFunction("pause");
     }
 
     /**
      * Resets the current value to the start time
      */
     public void reset() {
-        getElement().callFunction("ready");
+        getElement().callJsFunction("ready");
     }
 
     /**
