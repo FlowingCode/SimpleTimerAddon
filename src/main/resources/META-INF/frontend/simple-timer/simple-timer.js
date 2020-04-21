@@ -73,6 +73,30 @@ Polymer({
           value: false
         },
         /**
+         * Set to false to hide fractional seconds
+         * @default true
+         */
+        fractions: {
+        	type: Boolean,
+        	value: true
+        },
+        /**
+         * Set to true to show minutes
+         * @default false
+         */
+        minutes: {
+        	type: Boolean,
+        	value: false
+        },
+        /**
+         * Set to true to show hours, and minutes
+         * @default false
+         */
+        hours: {
+        	type: Boolean,
+        	value: false
+        },
+        /**
         * Time the timer has spent running since it was started
         */
         _elapsedTime: {
@@ -140,6 +164,19 @@ Polymer({
 
       _formatTime: function(time) {
         var timeString = time.toString().split('.');
-        return timeString[0].indexOf('-') === 0 ? 0 : timeString[0] + '.' + timeString[1].substring(0,2);
+        if (timeString[0].indexOf('-') === 0) {
+        	return 0;
+        }
+        var seconds = timeString[0];
+        var minutes = seconds / 60 | 0;
+        var hours = minutes / 60 | 0;
+        
+        minutes = this.hours ? minutes % 60 : minutes;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        
+        seconds = this.minutes || this.hours ? seconds % 60 : seconds;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        
+        return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
       }
     });

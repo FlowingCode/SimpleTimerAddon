@@ -80,6 +80,33 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
     }
 
     /**
+     * Enables showing fractions of a second
+     *
+     * @param fractions
+     */
+    public void setFractions(final boolean fractions) {
+        getElement().setProperty("fractions", fractions);
+    }
+
+    /**
+     * Enables showing minutes
+     * 
+     * @param minutes
+     */
+    public void setMinutes(final boolean minutes) {
+        getElement().setProperty("minutes", minutes);
+    }
+
+    /**
+     * Enables showing hours and minutes
+     * 
+     * @param hours
+     */
+    public void setHours(final boolean hours) {
+        getElement().setProperty("hours", hours);
+    }
+
+    /**
      * Starts or stops the timer if it is already started
      */
     public void start() {
