@@ -59,10 +59,14 @@ public class DemoView extends Div {
         fractions.addValueChangeListener(e -> timer.setFractions(e.getValue()));
         final Checkbox minutes = new Checkbox("Minutes", e -> timer.setMinutes(e.getValue()));
         final Checkbox hours = new Checkbox("Hours", e -> timer.setHours(e.getValue()));
+        final Checkbox visible = new Checkbox("Visible", e->{
+        	if (e.isFromClient()) timer.setVisible(!timer.isVisible());	
+        });
+        visible.setValue(true);
         timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
         final HorizontalLayout topLayout = new HorizontalLayout(new Span("SimpleTimer"), timer);
         topLayout.setAlignItems(Alignment.CENTER);
-        final HorizontalLayout bottomLayout = new HorizontalLayout(startTime, countUp, start, stop, reset, running, fractions, minutes, hours);
+        final HorizontalLayout bottomLayout = new HorizontalLayout(startTime, countUp, start, stop, reset, running, fractions, minutes, hours, visible);
         bottomLayout.setAlignItems(Alignment.CENTER);
         add(new VerticalLayout(topLayout, bottomLayout));
 

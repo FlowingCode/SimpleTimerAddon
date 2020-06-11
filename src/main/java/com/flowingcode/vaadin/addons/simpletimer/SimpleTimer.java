@@ -41,7 +41,7 @@ import com.vaadin.flow.shared.Registration;
 public class SimpleTimer extends Component implements HasSize, HasStyle {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	/**
      * Creates a timer with a start time of 60
      */
@@ -169,4 +169,13 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
     public Registration addTimerEndEvent(final ComponentEventListener<TimerEndedEvent> listener) {
         return addListener(TimerEndedEvent.class, listener);
     }
+    
+	public boolean isVisible() {
+		return getStyle().get("display").equals("inline");
+	}
+
+	public void setVisible(boolean visible) {
+		getStyle().set("display",visible?"inline":"none");
+	}
+
 }
