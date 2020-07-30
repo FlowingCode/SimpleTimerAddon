@@ -54,7 +54,8 @@ public class DemoView extends Div {
         final Button reset = new Button("Reset", e -> {
             timer.reset();
         });
-        final Button running = new Button("Current Time", e -> Notification.show(timer.isRunning() ? timer.getCurrentTime().toPlainString() : "Not Running"));
+		final Button running = new Button("Current Time", e -> timer.getCurrentTimeAsync().thenAccept(
+				time -> Notification.show(time.toPlainString() + (timer.isRunning() ? "" : " (Not Running)"))));
         final Checkbox fractions = new Checkbox("Fractions", true);
         fractions.addValueChangeListener(e -> timer.setFractions(e.getValue()));
         final Checkbox minutes = new Checkbox("Minutes", e -> timer.setMinutes(e.getValue()));
