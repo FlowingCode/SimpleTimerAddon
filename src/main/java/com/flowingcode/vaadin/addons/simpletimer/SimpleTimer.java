@@ -21,6 +21,8 @@ package com.flowingcode.vaadin.addons.simpletimer;
 
 
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -31,6 +33,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Synchronize;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.dom.PropertyChangeListener;
 import com.vaadin.flow.shared.Registration;
 
 /**
@@ -41,12 +44,12 @@ import com.vaadin.flow.shared.Registration;
 public class SimpleTimer extends Component implements HasSize, HasStyle {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
      * Creates a timer with a start time of 60
      */
     public SimpleTimer() {
-        getElement().getStyle().set("display", "inline");
+		this(60);
     }
 
     /**
@@ -55,7 +58,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
      * @param startTime value in seconds for the start time
      */
     public SimpleTimer(final Number startTime) {
-        this();
+		getElement().getStyle().set("display", "inline");
         setStartTime(startTime);
     }
 
@@ -66,6 +69,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
      */
     public void setStartTime(final Number startTime) {
         getElement().setProperty("startTime", startTime.doubleValue());
+		getElement().setProperty("currentTime", startTime.doubleValue());
         reset();
     }
 
@@ -90,7 +94,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
 
     /**
      * Enables showing minutes
-     * 
+     *
      * @param minutes
      */
     public void setMinutes(final boolean minutes) {
@@ -99,7 +103,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
 
     /**
      * Enables showing hours and minutes
-     * 
+     *
      * @param hours
      */
     public void setHours(final boolean hours) {
@@ -138,19 +142,45 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
     }
 
     /**
-     * Returns the current value of the timer
-     *
-     * @return current value in seconds
-     */
-    @Synchronize("current-time-changed")
-    public BigDecimal getCurrentTime() {
+	 * Returns the last known value of the timer. The value is updated when the
+	 * CurrentTimeChangeListener executes.
+	 *
+	 * @return current value in seconds
+	 */
+	@Synchronize("is-running-changed")
+	public BigDecimal getCurrentTime() {
         return BigDecimal.valueOf(getElement().getProperty("currentTime", 0d));
     }
 
     /**
-     * Event that gets triggered when the timer reaches 0
-     *
-     */
+	 * Returns the current value of the timer.
+	 *
+	 * @return a pending result that completes after retrieving the timer value.
+	 */
+	public CompletableFuture<BigDecimal> getCurrentTimeAsync() {
+		return getElement().executeJs("return this.currentTime")
+				.toCompletableFuture(Double.class)
+				.thenApply(BigDecimal::valueOf);
+	}
+
+	/**
+	 * Adds a property change listener for the {@code currentTime} property
+	 *
+	 * @return current value in seconds
+	 */
+	public Registration addCurrentTimeChangeListener(PropertyChangeListener listener, long time, TimeUnit timeUnit) {
+		int millis = (int) Math.min(timeUnit.toMillis(time), Integer.MAX_VALUE);
+		if (listener == null) {
+			listener = ev -> {
+			};
+		}
+		return getElement().addPropertyChangeListener("currentTime", "current-time-changed", listener).throttle(millis);
+	}
+
+	/**
+	 * Event that gets triggered when the timer reaches 0
+	 *
+	 */
     @DomEvent("simple-timer-end")
     public static class TimerEndedEvent extends ComponentEvent<SimpleTimer> {
 
@@ -169,11 +199,13 @@ public class SimpleTimer extends Component implements HasSize, HasStyle {
     public Registration addTimerEndEvent(final ComponentEventListener<TimerEndedEvent> listener) {
         return addListener(TimerEndedEvent.class, listener);
     }
-    
+
+	@Override
 	public boolean isVisible() {
 		return getStyle().get("display").equals("inline");
 	}
 
+	@Override
 	public void setVisible(boolean visible) {
 		getStyle().set("display",visible?"inline":"none");
 	}
