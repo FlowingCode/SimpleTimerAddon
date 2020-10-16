@@ -46,9 +46,21 @@ public class DemoView extends Div {
         timer.setWidth("100px");
         timer.setHeight("50px");
         timer.getStyle().set("font-size", "40px");
+        
+        Span timerTitle = new Span("Simple Count Up Timer");
+        
         final TextField startTime = new TextField("Start Time", e -> timer.setStartTime(new BigDecimal(e.getValue())));
         final Checkbox countUp = new Checkbox("Count Up", false);
-        countUp.addValueChangeListener(e -> timer.setCountUp(countUp.getValue()));
+		countUp.addValueChangeListener(e -> {
+			timer.setCountUp(countUp.getValue());
+			if (e.getValue()) {
+				startTime.setLabel("End Time");
+				timerTitle.setText("Simple Count Up Timer");
+			} else {
+				startTime.setLabel("Start Time");
+				timerTitle.setText("Simple Countdown Timer");
+			}
+		});
         final Button start = new Button("Start/Stop", e -> timer.start());
         final Button stop = new Button("Stop", e -> timer.pause());
         final Button reset = new Button("Reset", e -> {
@@ -64,12 +76,19 @@ public class DemoView extends Div {
         	if (e.isFromClient()) timer.setVisible(!timer.isVisible());	
         });
         visible.setValue(true);
+
         timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
-        final HorizontalLayout topLayout = new HorizontalLayout(new Span("SimpleTimer"), timer);
+
+		final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
         topLayout.setAlignItems(Alignment.CENTER);
-        final HorizontalLayout bottomLayout = new HorizontalLayout(startTime, countUp, start, stop, reset, running, fractions, minutes, hours, visible);
-        bottomLayout.setAlignItems(Alignment.CENTER);
-        add(new VerticalLayout(topLayout, bottomLayout));
+
+		HorizontalLayout options = new HorizontalLayout(countUp, fractions, minutes, hours, visible);
+		options.setAlignItems(Alignment.CENTER);
+
+		final HorizontalLayout bottomLayout = new HorizontalLayout(start, stop, reset, running);
+		bottomLayout.setAlignItems(Alignment.BASELINE);
+
+		add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
 
 	}
 
