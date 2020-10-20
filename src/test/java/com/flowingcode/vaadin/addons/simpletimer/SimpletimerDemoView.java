@@ -33,7 +33,7 @@ import com.vaadin.flow.router.Route;
 import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
-@Route(value = "simpletimer", layout = DemoLayout.class)
+@Route(value = "simple-timer", layout = DemoLayout.class)
 public class SimpletimerDemoView extends Div {
 
 	public SimpletimerDemoView() {
