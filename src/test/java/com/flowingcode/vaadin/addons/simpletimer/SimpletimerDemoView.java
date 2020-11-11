@@ -20,12 +20,14 @@
 package com.flowingcode.vaadin.addons.simpletimer;
 
 import com.flowingcode.vaadin.addons.DemoLayout;
+import com.flowingcode.vaadin.addons.GithubLink;
 import com.flowingcode.vaadin.addons.demo.impl.TabbedDemoImpl;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "simple-timer", layout = DemoLayout.class)
+@GithubLink("https://github.com/FlowingCode/SimpleTimerAddon")
 public class SimpletimerDemoView extends VerticalLayout {
 
 	private static final String ST_DEMO = "Simple Timer Demo";
