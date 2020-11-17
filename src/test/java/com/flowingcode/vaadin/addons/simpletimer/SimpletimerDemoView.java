@@ -21,22 +21,19 @@ package com.flowingcode.vaadin.addons.simpletimer;
 
 import com.flowingcode.vaadin.addons.DemoLayout;
 import com.flowingcode.vaadin.addons.GithubLink;
-import com.flowingcode.vaadin.addons.demo.impl.TabbedDemoImpl;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.flowingcode.vaadin.addons.demo.TabbedDemo;
 import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
 @Route(value = "simple-timer", layout = DemoLayout.class)
 @GithubLink("https://github.com/FlowingCode/SimpleTimerAddon")
-public class SimpletimerDemoView extends VerticalLayout {
+public class SimpletimerDemoView extends TabbedDemo {
 
 	private static final String ST_DEMO = "Simple Timer Demo";
 	private static final String ST_SOURCE = "https://github.com/FlowingCode/SimpleTimerAddon/blob/master/src/test/java/com/flowingcode/vaadin/addons/simpletimer/SimpletimerDemo.java";
 
 	public SimpletimerDemoView() {
-		TabbedDemoImpl<SimpletimerDemo> stDemo = new TabbedDemoImpl<SimpletimerDemo>(new SimpletimerDemo(), ST_DEMO,
-				ST_SOURCE);
+		addDemo(new SimpletimerDemo(), ST_DEMO, ST_SOURCE);
 		setSizeFull();
-		add(stDemo);
 	}
 }
