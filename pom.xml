@@ -177,6 +177,14 @@
                     </supportedPackagings>
                 </configuration>
             </plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.1</version>
+				<configuration>
+					<useSystemClassLoader>false</useSystemClassLoader>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 
@@ -269,6 +277,35 @@
                 </plugins>
             </build>
         </profile>
+
+		<profile>
+			<id>demo-jar</id>
+            <build>		
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>test-jar</goal>
+								</goals>
+								<configuration>
+									<classifier>demo</classifier>
+									<excludes>
+										<exclude>META-INF/resources/frontend/styles/shared-styles.css</exclude>
+										<exclude>**/test/*</exclude>
+										<exclude>**/integration/*</exclude>
+										<exclude>**/DemoView.class</exclude>
+										<exclude>**/DemoLayout.class</exclude>
+									</excludes>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
     </profiles>
 </project>
