@@ -36,6 +36,9 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.dom.PropertyChangeListener;
 import com.vaadin.flow.shared.Registration;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Leonardo Scardanzan / Flowing Code
@@ -45,12 +48,16 @@ import java.io.Serializable;
 public class SimpleTimer extends Component implements HasSize, HasStyle, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private static final int START_TIME_S = 60;
+	private static final String DISPLAY = "display";
+	private static final String INLINE = "inline";
+	private static final String CURRENT_TIME = "currentTime";
 
 	/**
      * Creates a timer with a start time of 60
      */
     public SimpleTimer() {
-		this(60);
+		this(START_TIME_S);
     }
 
     /**
@@ -59,7 +66,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
      * @param startTime value in seconds for the start time
      */
     public SimpleTimer(final Number startTime) {
-		getElement().getStyle().set("display", "inline");
+		getElement().getStyle().set(DISPLAY, INLINE);
         setStartTime(startTime);
     }
 
@@ -70,7 +77,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
      */
     public void setStartTime(final Number startTime) {
         getElement().setProperty("startTime", startTime.doubleValue());
-		getElement().setProperty("currentTime", startTime.doubleValue());
+		getElement().setProperty(CURRENT_TIME, startTime.doubleValue());
         reset();
     }
 
@@ -150,7 +157,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 	 */
 	@Synchronize("is-running-changed")
 	public BigDecimal getCurrentTime() {
-        return BigDecimal.valueOf(getElement().getProperty("currentTime", 0d));
+        return BigDecimal.valueOf(getElement().getProperty(CURRENT_TIME, 0d));
     }
 
     /**
@@ -175,7 +182,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 			listener = ev -> {
 			};
 		}
-		return getElement().addPropertyChangeListener("currentTime", "current-time-changed", listener).throttle(millis);
+		return getElement().addPropertyChangeListener(CURRENT_TIME, "current-time-changed", listener).throttle(millis);
 	}
 
 	/**
@@ -203,12 +210,12 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
 	@Override
 	public boolean isVisible() {
-		return getStyle().get("display").equals("inline");
+		return getStyle().get(DISPLAY).equals(INLINE);
 	}
 
 	@Override
 	public void setVisible(boolean visible) {
-		getStyle().set("display",visible?"inline":"none");
+		getStyle().set(DISPLAY,visible?INLINE:"none");
 	}
 
 }
