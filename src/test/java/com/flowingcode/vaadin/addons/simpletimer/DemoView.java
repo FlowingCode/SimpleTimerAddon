@@ -24,17 +24,13 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
-/**
- * @author Leonardo Scardanzan / Flowing Code
- */
+/** @author Leonardo Scardanzan / Flowing Code */
 @SuppressWarnings("serial")
 @Route("")
 public class DemoView extends VerticalLayout implements BeforeEnterObserver {
 
-	@Override
-	public void beforeEnter(BeforeEnterEvent event) {
-		event.forwardTo(SimpletimerDemoView.class);
-	}
-
+  @Override
+  public void beforeEnter(BeforeEnterEvent event) {
+    event.forwardTo(SimpletimerDemoView.class);
+  }
 }
-
