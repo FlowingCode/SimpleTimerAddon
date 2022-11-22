@@ -19,6 +19,8 @@
  */
 package com.flowingcode.vaadin.addons.simpletimer;
 
+import java.math.BigDecimal;
+import com.flowingcode.vaadin.addons.demo.DemoSource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Div;
@@ -28,9 +30,13 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import java.math.BigDecimal;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 
 @SuppressWarnings("serial")
+@PageTitle("Simple Timer Demo")
+@DemoSource
+@Route(value = "simple-timer/simple-timer", layout = SimpletimerDemoView.class)
 public class SimpletimerDemo extends Div {
 
   public SimpletimerDemo() {
