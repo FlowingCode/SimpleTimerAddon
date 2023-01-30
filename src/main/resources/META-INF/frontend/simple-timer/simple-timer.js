@@ -144,6 +144,7 @@ Polymer({
         if (!this.isRunning) {
           return;
         }
+        this.fire('simple-timer-step')
         if ((this.currentTime <= 0 && !this.countUp) 
             || (this.currentTime >= this.startTime && this.countUp) ) {
           // timer is over

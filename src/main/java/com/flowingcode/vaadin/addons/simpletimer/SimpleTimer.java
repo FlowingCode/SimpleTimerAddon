@@ -192,6 +192,22 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     return addListener(TimerEndedEvent.class, listener);
   }
 
+  /** Event that gets triggered when the timer makes a step*/
+  @DomEvent("simple-timer-step")
+  public static class TimerStepEvent extends ComponentEvent<SimpleTimer> {
+
+    public TimerStepEvent(final SimpleTimer source, final boolean fromClient) {super(source, fromClient);}
+  }
+
+  /**
+   * Adds a timer step listener that will be triggered when the timer makes a step
+   * @param listener
+   * @return
+   */
+  public Registration addTimerStepEvent(final ComponentEventListener<TimerStepEvent> listener) {
+    return addListener(TimerStepEvent.class, listener);
+  }
+
   @Override
   public boolean isVisible() {
     return getStyle().get(DISPLAY).equals(INLINE);
