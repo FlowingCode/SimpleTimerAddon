@@ -19,17 +19,11 @@
  */
 package com.flowingcode.vaadin.addons.simpletimer;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.DomEvent;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.Synchronize;
-import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.dom.PropertyChangeListener;
 import com.vaadin.flow.shared.Registration;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.concurrent.CompletableFuture;
@@ -152,9 +146,9 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    */
   public CompletableFuture<BigDecimal> getCurrentTimeAsync() {
     return getElement()
-        .executeJs("return this.currentTime")
-        .toCompletableFuture(Double.class)
-        .thenApply(BigDecimal::valueOf);
+            .executeJs("return this.currentTime")
+            .toCompletableFuture(Double.class)
+            .thenApply(BigDecimal::valueOf);
   }
 
   /**
@@ -163,14 +157,14 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @return current value in seconds
    */
   public Registration addCurrentTimeChangeListener(
-      PropertyChangeListener listener, long time, TimeUnit timeUnit) {
+          PropertyChangeListener listener, long time, TimeUnit timeUnit) {
     int millis = (int) Math.min(timeUnit.toMillis(time), Integer.MAX_VALUE);
     if (listener == null) {
       listener = ev -> {};
     }
     return getElement()
-        .addPropertyChangeListener(CURRENT_TIME, "current-time-changed", listener)
-        .throttle(millis);
+            .addPropertyChangeListener(CURRENT_TIME, "current-time-changed", listener)
+            .throttle(millis);
   }
 
   /** Event that gets triggered when the timer reaches 0 */
@@ -193,10 +187,10 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   /** Event that gets triggered when the timer makes a step*/
-  @DomEvent("simple-timer-step")
-  public static class TimerStepEvent extends ComponentEvent<SimpleTimer> {
+  @DomEvent("simple-timer-second-step")
+  public static class TimerStepSecondEvent extends ComponentEvent<SimpleTimer> {
 
-    public TimerStepEvent(final SimpleTimer source, final boolean fromClient) {super(source, fromClient);}
+    public TimerStepSecondEvent(final SimpleTimer source, final boolean fromClient) {super(source, fromClient);}
   }
 
   /**
@@ -204,8 +198,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @param listener
    * @return
    */
-  public Registration addTimerStepEvent(final ComponentEventListener<TimerStepEvent> listener) {
-    return addListener(TimerStepEvent.class, listener);
+  public Registration addTimerStepSecondEvent(final ComponentEventListener<TimerStepSecondEvent> listener) {
+    return addListener(TimerStepSecondEvent.class, listener);
   }
 
   @Override

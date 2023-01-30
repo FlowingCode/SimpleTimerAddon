@@ -94,7 +94,7 @@ public class SimpletimerDemo extends Div {
     visible.setValue(true);
 
     timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
-    timer.addTimerStepEvent(e -> Notification.show("Timer step"));
+    timer.addTimerStepSecondEvent(e -> Notification.show("Timer step"));
 
     final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
