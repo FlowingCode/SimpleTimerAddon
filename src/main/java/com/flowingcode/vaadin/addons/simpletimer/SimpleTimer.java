@@ -159,12 +159,16 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
   /**
    * Adds a property change listener for the {@code currentTime} property
+   * 
+   * @param listener the property change listener
+   * @param period the minimum period between listener invocations, or 0 to disable throttling
+   * @param periodUnit time duration of throttling period
    *
-   * @return current value in seconds
+   * @return this registration, for chaining
    */
   public Registration addCurrentTimeChangeListener(
-      PropertyChangeListener listener, long time, TimeUnit timeUnit) {
-    int millis = (int) Math.min(timeUnit.toMillis(time), Integer.MAX_VALUE);
+      PropertyChangeListener listener, long period, TimeUnit periodUnit) {
+    int millis = (int) Math.min(periodUnit.toMillis(period), Integer.MAX_VALUE);
     if (listener == null) {
       listener = ev -> {};
     }
