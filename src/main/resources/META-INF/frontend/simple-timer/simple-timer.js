@@ -176,7 +176,10 @@ Polymer({
         
         seconds = this.minutes || this.hours ? seconds % 60 : seconds;
         seconds = seconds < 10 ? '0' + seconds : seconds;
-        
+        // Format hours with leading zeros for a two-digit display
+        if (this.hours) {
+          hours = hours < 10 ? '0' + hours : hours;
+        }
         return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
       }
     });
