@@ -109,6 +109,15 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     getElement().setProperty("hours", hours);
   }
 
+  /**
+   * Use two digits for hours.
+   *
+   * @param doubleDigitHours true to format hours using two digits.
+   */
+  public void setDoubleDigitHours(final boolean doubleDigitHours) {
+    getElement().setProperty("doubleDigitHours", doubleDigitHours);
+  }
+
   /** Starts or stops the timer if it is already started */
   public void start() {
     getElement().callJsFunction("start");

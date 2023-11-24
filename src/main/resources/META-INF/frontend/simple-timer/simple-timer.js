@@ -97,6 +97,14 @@ Polymer({
         	value: false
         },
         /**
+         * Use two digits for hours
+         * @default false
+         */
+        doubleDigitHours: {
+        	type: Boolean,
+        	value: false
+        },
+        /**
         * Time the timer has spent running since it was started
         */
         _elapsedTime: {
@@ -177,6 +185,9 @@ Polymer({
         seconds = this.minutes || this.hours ? seconds % 60 : seconds;
         seconds = seconds < 10 ? '0' + seconds : seconds;
         
+        if(this.hours && this.doubleDigitHours) {
+			hours = hours.toString().padStart(2, '0');
+		}
         return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
       }
     });

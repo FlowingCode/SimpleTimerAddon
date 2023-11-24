@@ -85,6 +85,8 @@ public class SimpletimerDemo extends Div {
     fractions.addValueChangeListener(e -> timer.setFractions(e.getValue()));
     final Checkbox minutes = new Checkbox("Minutes", e -> timer.setMinutes(e.getValue()));
     final Checkbox hours = new Checkbox("Hours", e -> timer.setHours(e.getValue()));
+    final Checkbox doubleDigitHours =
+        new Checkbox("Double digit hours", e -> timer.setDoubleDigitHours(e.getValue()));
     final Checkbox visible =
         new Checkbox(
             "Visible",
@@ -98,8 +100,10 @@ public class SimpletimerDemo extends Div {
     final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
 
-    HorizontalLayout options = new HorizontalLayout(countUp, fractions, minutes, hours, visible);
+    HorizontalLayout options =
+        new HorizontalLayout(countUp, fractions, minutes, hours, visible, doubleDigitHours);
     options.setAlignItems(Alignment.CENTER);
+    options.getStyle().set("flex-wrap", "wrap");
 
     final HorizontalLayout bottomLayout = new HorizontalLayout(start, stop, reset, running);
     bottomLayout.setAlignItems(Alignment.BASELINE);
