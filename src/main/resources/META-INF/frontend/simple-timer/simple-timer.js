@@ -48,6 +48,13 @@ Polymer({
           value: 60
         },
         /**
+        * End time for the timer in seconds
+        */
+        endTime: {
+          type: Number,
+          value: 0
+        },
+        /**
         * Current time of the timer, in seconds
         */
         currentTime: {
@@ -124,16 +131,18 @@ Polymer({
         } else {
           this.set('currentTime', this.startTime);
         }
+        this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
       },
 
       start: function() {
         if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.startTime && this.countUp) ) {
+            || (this.currentTime >= this.endTime && this.countUp) ) {
           // timer is over
-          this.currentTime = this.countUp ? this.startTime : 0;
+          this.currentTime = this.countUp ? this.endTime : 0;
+          this._formattedTime = this._formatTime(this.currentTime);
         }
         
-        if (!this.startTime || this.isRunning) {
+        if (this.countUp && !this.endTime || !this.countUp && !this.startTime || this.isRunning) {
           this.pause();
           return;
         }
@@ -151,9 +160,10 @@ Polymer({
           return;
         }
         if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.startTime && this.countUp) ) {
+            || (this.currentTime >= this.endTime && this.countUp) ) {
           // timer is over
-          this.currentTime = this.countUp ? this.startTime : 0;
+          this.currentTime = this.countUp ? this.endTime : 0;
+          this._formattedTime = this._formatTime(this.currentTime);
           this.pause();
           this.fire('simple-timer-end');
           return;

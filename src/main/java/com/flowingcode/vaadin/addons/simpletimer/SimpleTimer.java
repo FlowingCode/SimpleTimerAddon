@@ -62,13 +62,23 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   /**
-   * Sets the start time
+   * Sets the start time, for countdown mode.
    *
    * @param startTime value in seconds for the start time
    */
   public void setStartTime(final Number startTime) {
     getElement().setProperty("startTime", startTime.doubleValue());
     getElement().setProperty(CURRENT_TIME, startTime.doubleValue());
+    reset();
+  }
+
+  /**
+   * Sets the end time, for countup mode.
+   *
+   * @param endTime value in seconds for the end time
+   */
+  public void setEndTime(final Number endTime) {
+    getElement().setProperty("endTime", endTime.doubleValue());
     reset();
   }
 
@@ -168,7 +178,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
   /**
    * Adds a property change listener for the {@code currentTime} property
-   * 
+   *
    * @param listener the property change listener
    * @param period the minimum period between listener invocations, or 0 to disable throttling
    * @param periodUnit time duration of throttling period
