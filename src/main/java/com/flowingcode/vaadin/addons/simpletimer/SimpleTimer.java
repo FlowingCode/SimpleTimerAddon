@@ -41,24 +41,13 @@ import java.util.concurrent.TimeUnit;
 public class SimpleTimer extends Component implements HasSize, HasStyle, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final int START_TIME_S = 60;
   private static final String DISPLAY = "display";
   private static final String INLINE = "inline";
   private static final String CURRENT_TIME = "currentTime";
 
-  /** Creates a timer with a start time of 60 */
+  /** Creates a timer */
   public SimpleTimer() {
-    this(START_TIME_S);
-  }
-
-  /**
-   * Creates a timer using the start time passed in the constructor
-   *
-   * @param startTime value in seconds for the start time
-   */
-  public SimpleTimer(final Number startTime) {
     getElement().getStyle().set(DISPLAY, INLINE);
-    setStartTime(startTime);
   }
 
   /**
