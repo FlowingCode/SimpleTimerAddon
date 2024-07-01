@@ -121,10 +121,8 @@ Polymer({
       ready: function() {
         if (this.countUp) {
           this.set('currentTime', 0);
-          this.set('_formattedTime', '0');
         } else {
           this.set('currentTime', this.startTime);
-          this.set('_formattedTime', this.startTime.toString());
         }
       },
 
@@ -174,6 +172,9 @@ Polymer({
         var timeString = time.toString().split('.');
         if (timeString[0].indexOf('-') === 0) {
         	return 0;
+        }
+        if (timeString.length==1) {
+            timeString.push("00");
         }
         var seconds = timeString[0];
         var minutes = seconds / 60 | 0;
