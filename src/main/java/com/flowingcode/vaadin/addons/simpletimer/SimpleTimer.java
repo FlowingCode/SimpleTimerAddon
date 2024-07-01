@@ -56,6 +56,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @param startTime value in seconds for the start time
    */
   public void setStartTime(final Number startTime) {
+    getElement().setProperty("countUp", false);
     getElement().setProperty("startTime", startTime.doubleValue());
     getElement().setProperty(CURRENT_TIME, startTime.doubleValue());
     reset();
@@ -67,17 +68,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @param endTime value in seconds for the end time
    */
   public void setEndTime(final Number endTime) {
+    getElement().setProperty("countUp", true);
     getElement().setProperty("endTime", endTime.doubleValue());
-    reset();
-  }
-
-  /**
-   * Changes the behavior to count up or down Default is false for count down
-   *
-   * @param countUp
-   */
-  public void setCountUp(final boolean countUp) {
-    getElement().setProperty("countUp", countUp);
     reset();
   }
 
