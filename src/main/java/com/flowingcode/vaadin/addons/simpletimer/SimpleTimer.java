@@ -41,44 +41,35 @@ import java.util.concurrent.TimeUnit;
 public class SimpleTimer extends Component implements HasSize, HasStyle, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final int START_TIME_S = 60;
   private static final String DISPLAY = "display";
   private static final String INLINE = "inline";
   private static final String CURRENT_TIME = "currentTime";
 
-  /** Creates a timer with a start time of 60 */
+  /** Creates a timer */
   public SimpleTimer() {
-    this(START_TIME_S);
-  }
-
-  /**
-   * Creates a timer using the start time passed in the constructor
-   *
-   * @param startTime value in seconds for the start time
-   */
-  public SimpleTimer(final Number startTime) {
     getElement().getStyle().set(DISPLAY, INLINE);
-    setStartTime(startTime);
   }
 
   /**
-   * Sets the start time
+   * Sets the start time, for countdown mode.
    *
    * @param startTime value in seconds for the start time
    */
   public void setStartTime(final Number startTime) {
+    getElement().setProperty("countUp", false);
     getElement().setProperty("startTime", startTime.doubleValue());
     getElement().setProperty(CURRENT_TIME, startTime.doubleValue());
     reset();
   }
 
   /**
-   * Changes the behavior to count up or down Default is false for count down
+   * Sets the end time, for countup mode.
    *
-   * @param countUp
+   * @param endTime value in seconds for the end time
    */
-  public void setCountUp(final boolean countUp) {
-    getElement().setProperty("countUp", countUp);
+  public void setEndTime(final Number endTime) {
+    getElement().setProperty("countUp", true);
+    getElement().setProperty("endTime", endTime.doubleValue());
     reset();
   }
 
@@ -168,7 +159,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
   /**
    * Adds a property change listener for the {@code currentTime} property
-   * 
+   *
    * @param listener the property change listener
    * @param period the minimum period between listener invocations, or 0 to disable throttling
    * @param periodUnit time duration of throttling period

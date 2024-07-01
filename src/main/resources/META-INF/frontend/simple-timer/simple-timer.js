@@ -41,11 +41,17 @@ Polymer({
       properties: {
         /**
         * Start time for the timer in seconds
-        * @default 60
         */
         startTime: {
           type: Number,
-          value: 60
+          value: 0
+        },
+        /**
+        * End time for the timer in seconds
+        */
+        endTime: {
+          type: Number,
+          value: 0
         },
         /**
         * Current time of the timer, in seconds
@@ -121,21 +127,21 @@ Polymer({
       ready: function() {
         if (this.countUp) {
           this.set('currentTime', 0);
-          this.set('_formattedTime', '0');
         } else {
           this.set('currentTime', this.startTime);
-          this.set('_formattedTime', this.startTime.toString());
         }
+        this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
       },
 
       start: function() {
         if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.startTime && this.countUp) ) {
+            || (this.currentTime >= this.endTime && this.countUp) ) {
           // timer is over
-          this.currentTime = this.countUp ? this.startTime : 0;
+          this.currentTime = this.countUp ? this.endTime : 0;
+          this._formattedTime = this._formatTime(this.currentTime);
         }
         
-        if (!this.startTime || this.isRunning) {
+        if (this.countUp && !this.endTime || !this.countUp && !this.startTime || this.isRunning) {
           this.pause();
           return;
         }
@@ -153,9 +159,10 @@ Polymer({
           return;
         }
         if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.startTime && this.countUp) ) {
+            || (this.currentTime >= this.endTime && this.countUp) ) {
           // timer is over
-          this.currentTime = this.countUp ? this.startTime : 0;
+          this.currentTime = this.countUp ? this.endTime : 0;
+          this._formattedTime = this._formatTime(this.currentTime);
           this.pause();
           this.fire('simple-timer-end');
           return;
@@ -174,6 +181,9 @@ Polymer({
         var timeString = time.toString().split('.');
         if (timeString[0].indexOf('-') === 0) {
         	return 0;
+        }
+        if (timeString.length==1) {
+            timeString.push("00");
         }
         var seconds = timeString[0];
         var minutes = seconds / 60 | 0;

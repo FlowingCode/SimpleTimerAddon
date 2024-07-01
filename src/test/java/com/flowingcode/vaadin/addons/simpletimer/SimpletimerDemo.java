@@ -19,7 +19,6 @@
  */
 package com.flowingcode.vaadin.addons.simpletimer;
 
-import java.math.BigDecimal;
 import com.flowingcode.vaadin.addons.demo.DemoSource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -32,6 +31,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
 @PageTitle("Simple Timer Demo")
@@ -39,28 +39,37 @@ import com.vaadin.flow.router.Route;
 @Route(value = "simple-timer/simple-timer", layout = SimpletimerDemoView.class)
 public class SimpletimerDemo extends Div {
 
+  private final SimpleTimer timer = new SimpleTimer();
+
+  private boolean countUpMode;
+  private BigDecimal time = new BigDecimal(60);
+
   public SimpletimerDemo() {
-    this.setSizeFull();
-    final SimpleTimer timer = new SimpleTimer();
+    setSizeFull();
     timer.setWidth("100px");
     timer.setHeight("50px");
     timer.getStyle().set("font-size", "40px");
+    timer.setStartTime(60);
 
     Span timerTitle = new Span("Simple Count Up Timer");
 
     final TextField startTime =
-        new TextField("Start Time", e -> timer.setStartTime(new BigDecimal(e.getValue())));
+        new TextField("Start Time", e -> {
+          time = new BigDecimal(e.getValue());
+          update();
+        });
     final Checkbox countUp = new Checkbox("Count Up", false);
     countUp.addValueChangeListener(
         e -> {
-          timer.setCountUp(countUp.getValue());
-          if (e.getValue()) {
+          countUpMode = countUp.getValue();
+          if (countUpMode) {
             startTime.setLabel("End Time");
             timerTitle.setText("Simple Count Up Timer");
           } else {
             startTime.setLabel("Start Time");
             timerTitle.setText("Simple Countdown Timer");
           }
+          update();
         });
     final Button start = new Button("Start/Stop", e -> timer.start());
     final Button stop = new Button("Stop", e -> timer.pause());
@@ -91,7 +100,9 @@ public class SimpletimerDemo extends Div {
         new Checkbox(
             "Visible",
             e -> {
-              if (e.isFromClient()) timer.setVisible(!timer.isVisible());
+              if (e.isFromClient()) {
+                timer.setVisible(!timer.isVisible());
+              }
             });
     visible.setValue(true);
 
@@ -109,5 +120,13 @@ public class SimpletimerDemo extends Div {
     bottomLayout.setAlignItems(Alignment.BASELINE);
 
     add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
+  }
+
+  private void update() {
+    if (countUpMode) {
+      timer.setEndTime(time);
+    } else {
+      timer.setStartTime(time);
+    }
   }
 }
