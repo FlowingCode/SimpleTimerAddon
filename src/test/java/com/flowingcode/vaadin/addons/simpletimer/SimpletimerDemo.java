@@ -19,7 +19,6 @@
  */
 package com.flowingcode.vaadin.addons.simpletimer;
 
-import java.math.BigDecimal;
 import com.flowingcode.vaadin.addons.demo.DemoSource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -32,6 +31,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.math.BigDecimal;
 
 @SuppressWarnings("serial")
 @PageTitle("Simple Timer Demo")
@@ -40,7 +40,7 @@ import com.vaadin.flow.router.Route;
 public class SimpletimerDemo extends Div {
 
   public SimpletimerDemo() {
-    this.setSizeFull();
+    setSizeFull();
     final SimpleTimer timer = new SimpleTimer();
     timer.setWidth("100px");
     timer.setHeight("50px");
@@ -49,7 +49,10 @@ public class SimpletimerDemo extends Div {
     Span timerTitle = new Span("Simple Count Up Timer");
 
     final TextField startTime =
-        new TextField("Start Time", e -> timer.setStartTime(new BigDecimal(e.getValue())));
+        new TextField("Start Time", e -> {
+          timer.setStartTime(new BigDecimal(e.getValue()));
+          timer.setEndTime(new BigDecimal(e.getValue()));
+        });
     final Checkbox countUp = new Checkbox("Count Up", false);
     countUp.addValueChangeListener(
         e -> {
@@ -91,7 +94,9 @@ public class SimpletimerDemo extends Div {
         new Checkbox(
             "Visible",
             e -> {
-              if (e.isFromClient()) timer.setVisible(!timer.isVisible());
+              if (e.isFromClient()) {
+                timer.setVisible(!timer.isVisible());
+              }
             });
     visible.setValue(true);
 
