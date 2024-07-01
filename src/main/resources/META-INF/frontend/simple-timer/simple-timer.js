@@ -41,11 +41,10 @@ Polymer({
       properties: {
         /**
         * Start time for the timer in seconds
-        * @default 60
         */
         startTime: {
           type: Number,
-          value: 60
+          value: 0
         },
         /**
         * End time for the timer in seconds
