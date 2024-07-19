@@ -22,6 +22,7 @@ package com.flowingcode.vaadin.addons.simpletimer;
 import com.flowingcode.vaadin.addons.demo.DemoSource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
@@ -36,15 +37,15 @@ import java.math.BigDecimal;
 @SuppressWarnings("serial")
 @PageTitle("Simple Timer Demo")
 @DemoSource
-@Route(value = "simple-timer/simple-timer", layout = SimpletimerDemoView.class)
-public class SimpletimerDemo extends Div {
+@Route(value = "simple-timer/simple-timer2", layout = SimpletimerDemoView.class)
+public class SimpletimerDemo2 extends Div {
 
   private final SimpleTimer timer = new SimpleTimer();
 
   private boolean countUpMode;
   private BigDecimal time = new BigDecimal(60);
 
-  public SimpletimerDemo() {
+  public SimpletimerDemo2() {
     setSizeFull();
     timer.setWidth("100px");
     timer.setHeight("50px");
@@ -71,7 +72,7 @@ public class SimpletimerDemo extends Div {
           }
           update();
         });
-    final Button start = new Button("Start", e -> timer.start());
+    final Button start = new Button("Start/Stop", e -> timer.start());
     final Button stop = new Button("Stop", e -> timer.pause());
     final Button reset =
         new Button(
@@ -108,7 +109,7 @@ public class SimpletimerDemo extends Div {
 
     timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
 
-    final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
+    final HorizontalLayout topLayout = new HorizontalLayout(timerTitle);
     topLayout.setAlignItems(Alignment.CENTER);
 
     HorizontalLayout options =
@@ -120,6 +121,12 @@ public class SimpletimerDemo extends Div {
     bottomLayout.setAlignItems(Alignment.BASELINE);
 
     add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
+
+    Dialog dlg = new Dialog(timer);
+    dlg.setModal(false);
+    dlg.setCloseOnOutsideClick(false);
+    dlg.add(new Button("Close", ev -> dlg.close()));
+    add(new Button("OPEN", ev -> dlg.open()));
   }
 
   private void update() {

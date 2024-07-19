@@ -113,7 +113,7 @@ Polymer({
         /**
         * Time the timer has spent running since it was started
         */
-        _elapsedTime: {
+        _elapsed: {
           type: Number,
           value: 0
         },
@@ -125,12 +125,10 @@ Polymer({
       },
 
       ready: function() {
-        if (this.countUp) {
-          this.set('currentTime', 0);
-        } else {
-          this.set('currentTime', this.startTime);
-        }
-        this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
+		if (this.currentTime===undefined) {
+	        this.set('currentTime', this.countUp ? 0 : this.startTime);
+	    }
+       	this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
       },
 
       start: function() {
@@ -155,7 +153,8 @@ Polymer({
       },
 
       _decreaseTimer: function(timestamp) {
-        if (!this.isRunning) {
+		console.error("_decreaseTimer  "+this.isRunning+" "+this.currentTime);  
+        if (!this.isRunning || !this.isAttached) {
           return;
         }
         if ((this.currentTime <= 0 && !this.countUp) 
@@ -199,5 +198,14 @@ Polymer({
 			hours = hours.toString().padStart(2, '0');
 		}
         return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
-      }
+      },
+      
+      detached: function() {
+        this.isAttached=false;  
+      },
+      attached: function() {
+        this.isAttached=true;
+        debugger;
+        if (this.isRunning) window.requestAnimationFrame(this._decreaseTimer.bind(this));
+      },
     });
