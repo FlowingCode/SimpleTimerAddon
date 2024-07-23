@@ -2,6 +2,7 @@ package com.flowingcode.addons.simpletimer.integration;
 
 import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
 import com.vaadin.flow.component.ClientCallable;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 
@@ -10,8 +11,24 @@ public class IntegrationView extends Div implements IntegrationCallables {
 
   private SimpleTimer timer = new SimpleTimer();
 
+  private Dialog dialog;
   public IntegrationView() {
     add(timer);
+  }
+
+  @Override
+  @ClientCallable
+  public void openDialog() {
+    if (dialog == null) {
+      dialog = new Dialog(timer);
+    }
+    dialog.open();
+  }
+
+  @Override
+  @ClientCallable
+  public void closeDialog() {
+    dialog.close();
   }
 
   @Override

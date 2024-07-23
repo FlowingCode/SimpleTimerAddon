@@ -14,4 +14,16 @@ public interface IntegrationCallables {
 
   boolean isRunning();
 
+  void openDialog();
+
+  void closeDialog();
+  // BigDecimal getCurrentTime();
+  //
+  // CompletableFuture<BigDecimal> getCurrentTimeAsync();
+  //
+  // Registration addCurrentTimeChangeListener(PropertyChangeListener listener, long period,
+  // TimeUnit periodUnit);
+  //
+  // Registration addTimerEndEvent(ComponentEventListener<TimerEndedEvent> listener);
+
 }
