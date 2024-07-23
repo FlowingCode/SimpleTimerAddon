@@ -109,6 +109,10 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     getElement().setProperty("doubleDigitHours", doubleDigitHours);
   }
 
+  public void setTargetId(final String targetId) {
+    getElement().setProperty("targetId", targetId);
+  }
+
   /** Starts or stops the timer if it is already started */
   public void start() {
     getElement().callJsFunction("start");
@@ -167,8 +171,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @return this registration, for chaining
    */
   public Registration addCurrentTimeChangeListener(
-      PropertyChangeListener listener, long period, TimeUnit periodUnit) {
-    int millis = (int) Math.min(periodUnit.toMillis(period), Integer.MAX_VALUE);
+      PropertyChangeListener listener, final long period, final TimeUnit periodUnit) {
+    final int millis = (int) Math.min(periodUnit.toMillis(period), Integer.MAX_VALUE);
     if (listener == null) {
       listener = ev -> {};
     }
@@ -202,7 +206,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   @Override
-  public void setVisible(boolean visible) {
+  public void setVisible(final boolean visible) {
     getStyle().set(DISPLAY, visible ? INLINE : "none");
   }
 }
