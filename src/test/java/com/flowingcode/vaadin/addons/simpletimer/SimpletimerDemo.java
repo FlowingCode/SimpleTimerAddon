@@ -51,12 +51,16 @@ public class SimpletimerDemo extends Div {
     timer.getStyle().set("font-size", "40px");
     timer.setStartTime(60);
 
-    Span timerTitle = new Span("Simple Count Up Timer");
+    final Span timerTitle = new Span("Simple Count Up Timer");
 
     final TextField startTime =
         new TextField("Start Time", e -> {
-          time = new BigDecimal(e.getValue());
-          update();
+          try {
+            time = new BigDecimal(e.getValue());
+            update();
+          } catch (final Exception ex) {
+            Notification.show("Please enter a number");
+          }
         });
     final Checkbox countUp = new Checkbox("Count Up", false);
     countUp.addValueChangeListener(
@@ -111,7 +115,7 @@ public class SimpletimerDemo extends Div {
     final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
 
-    HorizontalLayout options =
+    final HorizontalLayout options =
         new HorizontalLayout(countUp, fractions, minutes, hours, visible, doubleDigitHours);
     options.setAlignItems(Alignment.CENTER);
     options.getStyle().set("flex-wrap", "wrap");
