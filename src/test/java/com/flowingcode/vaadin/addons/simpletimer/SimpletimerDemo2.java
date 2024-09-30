@@ -24,6 +24,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
@@ -52,7 +53,7 @@ public class SimpletimerDemo2 extends Div {
     timer.getStyle().set("font-size", "40px");
     timer.setStartTime(60);
 
-    Span timerTitle = new Span("Simple Count Up Timer");
+    final Span timerTitle = new Span("Simple Count Up Timer");
 
     final TextField startTime =
         new TextField("Start Time", e -> {
@@ -109,10 +110,11 @@ public class SimpletimerDemo2 extends Div {
 
     timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
 
-    final HorizontalLayout topLayout = new HorizontalLayout(timerTitle);
+    timer.setVisible(false);
+    final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
 
-    HorizontalLayout options =
+    final HorizontalLayout options =
         new HorizontalLayout(countUp, fractions, minutes, hours, visible, doubleDigitHours);
     options.setAlignItems(Alignment.CENTER);
     options.getStyle().set("flex-wrap", "wrap");
@@ -122,7 +124,10 @@ public class SimpletimerDemo2 extends Div {
 
     add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
 
-    Dialog dlg = new Dialog(timer);
+    final Label timerTarget = new Label();
+    timerTarget.setId("timerTarget");
+
+    final Dialog dlg = new Dialog(timerTarget);
     dlg.setModal(false);
     dlg.setCloseOnOutsideClick(false);
     dlg.add(new Button("Close", ev -> dlg.close()));

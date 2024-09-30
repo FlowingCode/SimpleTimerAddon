@@ -4,23 +4,30 @@ import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.router.Route;
 
 @Route("/it")
 public class IntegrationView extends Div implements IntegrationCallables {
 
-  private SimpleTimer timer = new SimpleTimer();
+  private final SimpleTimer timer = new SimpleTimer();
 
   private Dialog dialog;
+
+  private final Label timerTarget;
+
   public IntegrationView() {
     add(timer);
+    timerTarget = new Label();
+    timerTarget.setId("timerTarget");
+    timer.setTargetId("timerTarget");
   }
 
   @Override
   @ClientCallable
   public void openDialog() {
     if (dialog == null) {
-      dialog = new Dialog(timer);
+      dialog = new Dialog(timerTarget);
     }
     dialog.open();
   }
@@ -33,13 +40,13 @@ public class IntegrationView extends Div implements IntegrationCallables {
 
   @Override
   @ClientCallable
-  public void setStartTime(Integer startTime) {
+  public void setStartTime(final Integer startTime) {
     timer.setStartTime(startTime);
   }
 
   @Override
   @ClientCallable
-  public void setEndTime(Integer endTime) {
+  public void setEndTime(final Integer endTime) {
     timer.setEndTime(endTime);
   }
 
