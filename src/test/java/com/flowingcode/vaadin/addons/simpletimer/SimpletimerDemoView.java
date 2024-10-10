@@ -20,6 +20,7 @@
 package com.flowingcode.vaadin.addons.simpletimer;
 
 import com.flowingcode.vaadin.addons.DemoLayout;
+import com.flowingcode.vaadin.addons.GithubBranch;
 import com.flowingcode.vaadin.addons.GithubLink;
 import com.flowingcode.vaadin.addons.demo.TabbedDemo;
 import com.vaadin.flow.router.ParentLayout;
@@ -29,6 +30,7 @@ import com.vaadin.flow.router.Route;
 @ParentLayout(DemoLayout.class)
 @Route("simple-timer")
 @GithubLink("https://github.com/FlowingCode/SimpleTimerAddon")
+@GithubBranch("2.x")
 public class SimpletimerDemoView extends TabbedDemo {
 
   public SimpletimerDemoView() {
