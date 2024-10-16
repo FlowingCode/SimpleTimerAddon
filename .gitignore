@@ -4,6 +4,10 @@
 /.project
 /node_modules
 /webpack.generated.js
+/webpack.config.js
 /node
 /package.json
 /package-lock.json
+/frontend/index.html
+/frontend/generated
+/error-screenshots
