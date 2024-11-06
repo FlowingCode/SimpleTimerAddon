@@ -127,7 +127,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   /**
    * Returns the status of the timer
    *
-   * @return
+   * @return {@code true} if the timer is running, {@code false} otherwise.
    */
   @Synchronize(property = "isRunning", value = "is-running-changed")
   public boolean isRunning() {
@@ -190,7 +190,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * Adds a timer ended listener that will be triggered when the timer reaches 0
    *
    * @param listener
-   * @return
+   * @return a handle that can be used for removing the listener
    */
   public Registration addTimerEndEvent(final ComponentEventListener<TimerEndedEvent> listener) {
     return addListener(TimerEndedEvent.class, listener);
