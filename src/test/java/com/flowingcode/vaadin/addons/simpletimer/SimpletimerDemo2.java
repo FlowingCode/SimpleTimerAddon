@@ -22,7 +22,9 @@ package com.flowingcode.vaadin.addons.simpletimer;
 import com.flowingcode.vaadin.addons.demo.DemoSource;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
@@ -36,15 +38,15 @@ import java.math.BigDecimal;
 @SuppressWarnings("serial")
 @PageTitle("Simple Timer Demo")
 @DemoSource
-@Route(value = "simple-timer/simple-timer", layout = SimpletimerDemoView.class)
-public class SimpletimerDemo extends Div {
+@Route(value = "simple-timer/simple-timer2", layout = SimpletimerDemoView.class)
+public class SimpletimerDemo2 extends Div {
 
   private final SimpleTimer timer = new SimpleTimer();
 
   private boolean countUpMode;
   private BigDecimal time = new BigDecimal(60);
 
-  public SimpletimerDemo() {
+  public SimpletimerDemo2() {
     setSizeFull();
     timer.setWidth("100px");
     timer.setHeight("50px");
@@ -55,12 +57,8 @@ public class SimpletimerDemo extends Div {
 
     final TextField startTime =
         new TextField("Start Time", e -> {
-          try {
-            time = new BigDecimal(e.getValue());
-            update();
-          } catch (final Exception ex) {
-            Notification.show("Please enter a number");
-          }
+          time = new BigDecimal(e.getValue());
+          update();
         });
     final Checkbox countUp = new Checkbox("Count Up", false);
     countUp.addValueChangeListener(
@@ -75,7 +73,7 @@ public class SimpletimerDemo extends Div {
           }
           update();
         });
-    final Button start = new Button("Start", e -> timer.start());
+    final Button start = new Button("Start/Stop", e -> timer.start());
     final Button stop = new Button("Stop", e -> timer.pause());
     final Button reset =
         new Button(
@@ -112,6 +110,7 @@ public class SimpletimerDemo extends Div {
 
     timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
 
+    timer.setVisible(false);
     final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
 
@@ -124,6 +123,15 @@ public class SimpletimerDemo extends Div {
     bottomLayout.setAlignItems(Alignment.BASELINE);
 
     add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
+
+    final Label timerTarget = new Label();
+    timerTarget.setId("timerTarget");
+
+    final Dialog dlg = new Dialog(timerTarget);
+    dlg.setModal(false);
+    dlg.setCloseOnOutsideClick(false);
+    dlg.add(new Button("Close", ev -> dlg.close()));
+    add(new Button("OPEN", ev -> dlg.open()));
   }
 
   private void update() {
