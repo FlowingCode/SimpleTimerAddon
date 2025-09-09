@@ -110,27 +110,30 @@ Polymer({
         	type: Boolean,
         	value: false
         },
+		targetId: {
+			type: String,
+			value: null,
+		},
         /**
         * Time the timer has spent running since it was started
         */
-        _elapsedTime: {
+        _elapsed: {
           type: Number,
           value: 0
         },
 
         _formattedTime: {
           type: String,
-          value: '0'
+          value: '0',
+		  observer: "_updateTarget",
         }
       },
 
       ready: function() {
-        if (this.countUp) {
-          this.set('currentTime', 0);
-        } else {
-          this.set('currentTime', this.startTime);
-        }
-        this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
+		if (this.currentTime===undefined) {
+	        this.set('currentTime', this.countUp ? 0 : this.startTime);
+	    }
+       	this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
       },
 
       start: function() {
@@ -199,5 +202,10 @@ Polymer({
 			hours = hours.toString().padStart(2, '0');
 		}
         return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
-      }
+      },
+	  _updateTarget: function(newValue, oldValue){
+  		if (document.getElementById(this.targetId)) {
+  			document.getElementById(this.targetId).innerText = newValue;	
+  		}
+  	  }
     });
