@@ -28,6 +28,7 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Synchronize;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.dom.PropertyChangeListener;
 import com.vaadin.flow.shared.Registration;
 import java.io.Serializable;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 /** @author Leonardo Scardanzan / Flowing Code */
 @Tag("simple-timer")
+@NpmPackage(value = "@polymer/polymer", version = "3.5.2")
 @JsModule("./simple-timer/simple-timer.js")
 public class SimpleTimer extends Component implements HasSize, HasStyle, Serializable {
 
