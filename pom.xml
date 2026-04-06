@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jetty.version>9.4.36.v20210114</jetty.version>
-        <flowingcode.commons.demo.version>3.5.0</flowingcode.commons.demo.version>
+        <flowingcode.commons.demo.version>3.10.0</flowingcode.commons.demo.version>
     </properties>
     <organization>
        <name>Flowing Code</name>
