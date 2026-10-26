@@ -31,7 +31,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.Locale;
 
 @SuppressWarnings("serial")
 @PageTitle("Simple Timer Demo")
@@ -42,26 +43,28 @@ public class SimpletimerDemo extends Div {
   private final SimpleTimer timer = new SimpleTimer();
 
   private boolean countUpMode;
-  private BigDecimal time = new BigDecimal(60);
+  private Duration time = Duration.ofSeconds(60);
 
   public SimpletimerDemo() {
     setSizeFull();
     timer.setWidth("100px");
     timer.setHeight("50px");
     timer.getStyle().set("font-size", "40px");
-    timer.setStartTime(60);
+    timer.setCountdown(time);
 
-    final Span timerTitle = new Span("Simple Count Up Timer");
+    final Span timerTitle = new Span("Simple Countdown Timer");
 
     final TextField startTime =
-        new TextField("Start Time", e -> {
-          try {
-            time = new BigDecimal(e.getValue());
-            update();
-          } catch (final Exception ex) {
-            Notification.show("Please enter a number");
-          }
-        });
+        new TextField(
+            "Start Time",
+            e -> {
+              try {
+                time = Duration.ofMillis(Math.round(Double.parseDouble(e.getValue()) * 1000));
+                update();
+              } catch (final Exception ex) {
+                Notification.show("Please enter a positive number");
+              }
+            });
     final Checkbox countUp = new Checkbox("Count Up", false);
     countUp.addValueChangeListener(
         e -> {
@@ -75,25 +78,16 @@ public class SimpletimerDemo extends Div {
           }
           update();
         });
-    final Button start = new Button("Start/Stop", e -> timer.start());
-    final Button stop = new Button("Stop", e -> timer.pause());
-    final Button reset =
-        new Button(
-            "Reset",
-            e -> {
-              timer.reset();
-            });
-    final Button running =
+    final Button start = new Button("Start", e -> timer.start());
+    final Button pause = new Button("Pause", e -> timer.pause());
+    final Button reset = new Button("Reset", e -> timer.reset());
+    final Button current =
         new Button(
             "Current Time",
             e ->
-                timer
-                    .getCurrentTimeAsync()
-                    .thenAccept(
-                        time ->
-                            Notification.show(
-                                time.toPlainString()
-                                    + (timer.isRunning() ? "" : " (Not Running)"))));
+                Notification.show(
+                    seconds(countUpMode ? timer.getElapsed() : timer.getRemaining())
+                        + (timer.isRunning() ? "" : " (Not Running)")));
     final Checkbox fractions = new Checkbox("Fractions", true);
     fractions.addValueChangeListener(e -> timer.setFractions(e.getValue()));
     final Checkbox minutes = new Checkbox("Minutes", e -> timer.setMinutes(e.getValue()));
@@ -110,7 +104,14 @@ public class SimpletimerDemo extends Div {
             });
     visible.setValue(true);
 
-    timer.addTimerEndEvent(e -> Notification.show("Timer Ended"));
+    final Span serverValue = new Span();
+    timer.addTickListener(
+        e ->
+            serverValue.setText(
+                "Elapsed on the server, once per second: " + seconds(e.getElapsed())),
+        Duration.ofSeconds(1));
+
+    timer.addTimerEndListener(e -> Notification.show("Timer Ended"));
 
     final HorizontalLayout topLayout = new HorizontalLayout(timerTitle, timer);
     topLayout.setAlignItems(Alignment.CENTER);
@@ -120,17 +121,21 @@ public class SimpletimerDemo extends Div {
     options.setAlignItems(Alignment.CENTER);
     options.getStyle().set("flex-wrap", "wrap");
 
-    final HorizontalLayout bottomLayout = new HorizontalLayout(start, stop, reset, running);
+    final HorizontalLayout bottomLayout = new HorizontalLayout(start, pause, reset, current);
     bottomLayout.setAlignItems(Alignment.BASELINE);
 
-    add(new VerticalLayout(topLayout, startTime, options, bottomLayout));
+    add(new VerticalLayout(topLayout, startTime, options, bottomLayout, serverValue));
+  }
+
+  private static String seconds(Duration duration) {
+    return String.format(Locale.ROOT, "%.2f s", duration.toMillis() / 1000d);
   }
 
   private void update() {
     if (countUpMode) {
-      timer.setEndTime(time);
+      timer.setCountUp(time);
     } else {
-      timer.setStartTime(time);
+      timer.setCountdown(time);
     }
   }
 }
