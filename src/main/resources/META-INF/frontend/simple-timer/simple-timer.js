@@ -47,6 +47,9 @@ export function formatTime(millis, {fractions, minutes, hours, doubleDigitHours}
 
 const FORMAT_PROPERTIES = ['fractions', 'minutes', 'hours', 'doubleDigitHours'];
 
+// Browsers store timeout delays as signed 32-bit integers; a longer delay fires immediately.
+const MAX_TIMEOUT = 2147483647;
+
 // Text node written by a timer inside each display element. Flow owns the display's other nodes, so
 // the timer only touches its own. Shared across timer instances, so that a timer element created
 // again after a detach reuses the node instead of appending a second one.
@@ -175,7 +178,7 @@ class SimpleTimer extends HTMLElement {
     this._endTimeout = setTimeout(() => {
       this._endTimeout = 0;
       if (!this._endIfDue()) this._scheduleEnd();
-    }, Math.max(remaining, 0));
+    }, Math.min(Math.max(remaining, 0), MAX_TIMEOUT));
   }
 
   /** Ends the timer if it has reached its limit, and returns whether it did. */
