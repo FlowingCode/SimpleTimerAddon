@@ -168,7 +168,9 @@ class SimpleTimer extends HTMLElement {
       this._fire('simple-timer-end');
       return;
     }
-    this._render();
+    const elapsed = this._elapsed();
+    const formatted = this._render();
+    this._fire('simple-timer-tick', {elapsed, remaining: this._limit - elapsed, formatted});
     this.dispatchEvent(new CustomEvent('current-time-changed'));
     this._loop();
   }
@@ -189,6 +191,7 @@ class SimpleTimer extends HTMLElement {
         node.data = text;
       }
     });
+    return text;
   }
 }
 
