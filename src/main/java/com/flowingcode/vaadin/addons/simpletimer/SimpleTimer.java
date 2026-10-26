@@ -46,8 +46,8 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>The state of the timer is kept on the server, as the time banked from previous runs plus the
  * instant the current run started. The browser only renders it. When the component is detached and
- * attached again, the elapsed time is pushed to the new client element, so the timer keeps
- * counting while it is not in the DOM.
+ * attached again, the elapsed time is pushed to the new client element, so the timer keeps counting
+ * while it is not in the DOM.
  *
  * @author Leonardo Scardanzan / Flowing Code
  */
@@ -325,15 +325,15 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   /**
-   * Shows the value of the timer inside another component as well. The browser updates the value
-   * on every frame, without round trips to the server.
+   * Shows the value of the timer inside another component as well. The browser updates the value on
+   * every frame, without round trips to the server.
    *
    * <p>The timer appends a text node to the component and only updates that node, so the content
    * the component already has is kept. To show the value only inside other components, hide the
    * timer with {@link #setVisible(boolean)}: it keeps running while hidden.
    *
-   * <p>The value is only updated while the timer is attached. To keep a display updated while it
-   * is moved in and out of view, for instance inside tabs, attach the timer somewhere it stays
+   * <p>The value is only updated while the timer is attached. To keep a display updated while it is
+   * moved in and out of view, for instance inside tabs, attach the timer somewhere it stays
    * attached and add only the display to the tab.
    *
    * @param display the component in which to show the value
