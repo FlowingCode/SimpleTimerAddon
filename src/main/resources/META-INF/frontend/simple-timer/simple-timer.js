@@ -74,6 +74,7 @@ class SimpleTimer extends HTMLElement {
     this._limit = 0;
     this._countUp = false;
     this._raf = 0;
+    this._endTimeout = 0;
     this._frame = this._frame.bind(this);
     this._displays = new Set();
 
@@ -92,11 +93,13 @@ class SimpleTimer extends HTMLElement {
     });
     this._render();
     if (this._running) this._loop();
+    this._scheduleEnd();
   }
 
   disconnectedCallback() {
     cancelAnimationFrame(this._raf);
     this._raf = 0;
+    this._scheduleEnd();
   }
 
   /** The displayed value in seconds. Kept for the deprecated currentTime property listener. */
@@ -118,6 +121,7 @@ class SimpleTimer extends HTMLElement {
     this._countUp = countUp;
     this._running = running;
     this._render();
+    this._scheduleEnd();
     if (!running) return;
     this._loop();
     if (pull) this.dispatchEvent(new CustomEvent('simple-timer-sync-request'));
@@ -158,16 +162,36 @@ class SimpleTimer extends HTMLElement {
     if (!this._raf && this.isConnected) this._raf = requestAnimationFrame(this._frame);
   }
 
+  /**
+   * Arms a timeout for the moment the timer reaches its limit. Frames stop in background tabs, so
+   * without it the end would only be noticed when the user returns; timeouts keep firing there,
+   * with a precision of about a second.
+   */
+  _scheduleEnd() {
+    clearTimeout(this._endTimeout);
+    this._endTimeout = 0;
+    if (!this._running || !this.isConnected) return;
+    const remaining = Math.ceil(this._limit - this._elapsed());
+    this._endTimeout = setTimeout(() => {
+      this._endTimeout = 0;
+      if (!this._endIfDue()) this._scheduleEnd();
+    }, Math.max(remaining, 0));
+  }
+
+  /** Ends the timer if it has reached its limit, and returns whether it did. */
+  _endIfDue() {
+    if (!this._running || this._elapsed() < this._limit) return false;
+    this._base = this._limit;
+    this._running = false;
+    this._scheduleEnd();
+    this._render();
+    this._fire('simple-timer-end');
+    return true;
+  }
+
   _frame() {
     this._raf = 0;
-    if (!this._running) return;
-    if (this._elapsed() >= this._limit) {
-      this._base = this._limit;
-      this._running = false;
-      this._render();
-      this._fire('simple-timer-end');
-      return;
-    }
+    if (!this._running || this._endIfDue()) return;
     const elapsed = this._elapsed();
     const formatted = this._render();
     this._fire('simple-timer-tick', {elapsed, remaining: this._limit - elapsed, formatted});
