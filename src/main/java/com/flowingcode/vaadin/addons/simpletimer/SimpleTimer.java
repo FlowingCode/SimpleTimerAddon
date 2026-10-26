@@ -23,6 +23,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
@@ -64,11 +65,21 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    */
   private static final Duration END_TOLERANCE = Duration.ofSeconds(1);
 
+  /** What the timer does while it is detached. */
+  public enum DetachPolicy {
+    /** The timer keeps counting while detached. */
+    CONTINUE,
+    /** The timer pauses when detached, and resumes when attached again. */
+    PAUSE
+  }
+
   private Duration limit = Duration.ZERO;
   private boolean countUp;
   private Duration baseElapsed = Duration.ZERO;
   private Instant startedAt;
   private boolean endNotified;
+  private DetachPolicy detachPolicy = DetachPolicy.CONTINUE;
+  private boolean pausedByDetach;
   private Clock clock = Clock.systemUTC();
 
   /** Creates a timer. */
@@ -140,6 +151,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
   /** Starts the timer. Does nothing if it is already running or has reached its limit. */
   public void start() {
+    pausedByDetach = false;
     if (startedAt != null || rawElapsed().compareTo(limit) >= 0) {
       return;
     }
@@ -150,6 +162,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
 
   /** Pauses the timer, keeping the elapsed time. Does nothing if it is not running. */
   public void pause() {
+    pausedByDetach = false;
     if (startedAt == null) {
       return;
     }
@@ -269,9 +282,39 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     return addListener(TimerEndedEvent.class, listener);
   }
 
+  /**
+   * Sets what the timer does while it is detached. The default is {@link DetachPolicy#CONTINUE}.
+   *
+   * @param detachPolicy the policy to apply when the timer is detached
+   */
+  public void setDetachPolicy(DetachPolicy detachPolicy) {
+    this.detachPolicy = Objects.requireNonNull(detachPolicy, "detachPolicy");
+  }
+
+  /**
+   * Returns what the timer does while it is detached.
+   *
+   * @return the detach policy
+   */
+  public DetachPolicy getDetachPolicy() {
+    return detachPolicy;
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+    if (detachPolicy == DetachPolicy.PAUSE && isRunning()) {
+      pause();
+      pausedByDetach = true;
+    }
+  }
+
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
+    if (pausedByDetach) {
+      start();
+    }
     if (startedAt != null && rawElapsed().compareTo(limit) >= 0) {
       end(true);
     }

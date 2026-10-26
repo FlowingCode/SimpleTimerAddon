@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer.DetachPolicy;
 import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer.TimerEndedEvent;
 import com.vaadin.flow.component.ComponentUtil;
 import java.math.BigDecimal;
@@ -230,6 +231,62 @@ public class SimpleTimerTest {
 
     assertTrue(ended.isEmpty());
     assertTrue(timer.isRunning());
+  }
+
+  @Test
+  public void continuePolicyCountsWhileDetached() {
+    timer.setCountdown(s(60));
+    timer.start();
+    clock.advance(s(10));
+    ComponentUtil.onComponentDetach(timer);
+    clock.advance(s(20));
+    ComponentUtil.onComponentAttach(timer, false);
+
+    assertTrue(timer.isRunning());
+    assertEquals(s(30), timer.getElapsed());
+  }
+
+  @Test
+  public void pausePolicyPausesWhileDetached() {
+    timer.setDetachPolicy(DetachPolicy.PAUSE);
+    timer.setCountdown(s(60));
+    timer.start();
+    clock.advance(s(10));
+    ComponentUtil.onComponentDetach(timer);
+    clock.advance(s(100));
+
+    assertFalse(timer.isRunning());
+    assertEquals(s(10), timer.getElapsed());
+
+    ComponentUtil.onComponentAttach(timer, false);
+    clock.advance(s(5));
+
+    assertTrue(timer.isRunning());
+    assertEquals(s(15), timer.getElapsed());
+  }
+
+  @Test
+  public void pausePolicyDoesNotResumeExplicitlyPausedTimer() {
+    timer.setDetachPolicy(DetachPolicy.PAUSE);
+    timer.setCountdown(s(60));
+    timer.start();
+    clock.advance(s(10));
+    ComponentUtil.onComponentDetach(timer);
+    timer.pause();
+    ComponentUtil.onComponentAttach(timer, false);
+
+    assertFalse(timer.isRunning());
+    assertEquals(s(10), timer.getElapsed());
+  }
+
+  @Test
+  public void pausePolicyDoesNotResumeTimerThatWasNotRunning() {
+    timer.setDetachPolicy(DetachPolicy.PAUSE);
+    timer.setCountdown(s(60));
+    ComponentUtil.onComponentDetach(timer);
+    ComponentUtil.onComponentAttach(timer, false);
+
+    assertFalse(timer.isRunning());
   }
 
   @Test
