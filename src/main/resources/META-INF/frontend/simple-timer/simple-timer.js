@@ -47,6 +47,11 @@ export function formatTime(millis, {fractions, minutes, hours, doubleDigitHours}
 
 const FORMAT_PROPERTIES = ['fractions', 'minutes', 'hours', 'doubleDigitHours'];
 
+// Text node written by a timer inside each display element. Flow owns the display's other nodes, so
+// the timer only touches its own. Shared across timer instances, so that a timer element created
+// again after a detach reuses the node instead of appending a second one.
+const displayNodes = new WeakMap();
+
 /**
  * Renders a timer whose state is owned by the server.
  *
@@ -70,6 +75,7 @@ class SimpleTimer extends HTMLElement {
     this._countUp = false;
     this._raf = 0;
     this._frame = this._frame.bind(this);
+    this._displays = new Set();
 
     this.attachShadow({mode: 'open'}).innerHTML = '<span part="value"></span>';
     this._value = this.shadowRoot.firstChild;
@@ -117,6 +123,27 @@ class SimpleTimer extends HTMLElement {
     if (pull) this.dispatchEvent(new CustomEvent('simple-timer-sync-request'));
   }
 
+  /** Starts writing the value into the given element. */
+  _bindDisplay(target) {
+    if (!target) return;
+    let node = displayNodes.get(target);
+    if (!node || node.parentNode !== target) {
+      node = document.createTextNode('');
+      target.appendChild(node);
+      displayNodes.set(target, node);
+    }
+    this._displays.add(target);
+    this._render();
+  }
+
+  /** Stops writing the value into the given element, and removes the text written so far. */
+  _unbindDisplay(target) {
+    if (!target || !this._displays.delete(target)) return;
+    const node = displayNodes.get(target);
+    if (node) node.remove();
+    displayNodes.delete(target);
+  }
+
   _elapsed() {
     const elapsed = this._base + (this._running ? performance.now() - this._origin : 0);
     return Math.min(elapsed, this._limit);
@@ -153,6 +180,15 @@ class SimpleTimer extends HTMLElement {
   _render() {
     const text = formatTime(this._displayed(), this);
     if (this._value.textContent !== text) this._value.textContent = text;
+    this._displays.forEach(target => {
+      const node = displayNodes.get(target);
+      if (!node || !target.isConnected) {
+        // Flow replaced or removed the element; the server binds the new one when it attaches
+        this._displays.delete(target);
+      } else if (node.data !== text) {
+        node.data = text;
+      }
+    });
   }
 }
 

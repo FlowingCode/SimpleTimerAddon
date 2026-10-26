@@ -35,6 +35,8 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +82,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   private boolean endNotified;
   private DetachPolicy detachPolicy = DetachPolicy.CONTINUE;
   private boolean pausedByDetach;
+  private final Map<Component, Registration> displays = new LinkedHashMap<>();
   private Clock clock = Clock.systemUTC();
 
   /** Creates a timer. */
@@ -300,6 +303,47 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     return detachPolicy;
   }
 
+  /**
+   * Shows the value of the timer inside another component as well. The browser updates the value
+   * on every frame, without round trips to the server.
+   *
+   * <p>The timer appends a text node to the component and only updates that node, so the content
+   * the component already has is kept. To show the value only inside other components, hide the
+   * timer with {@link #setVisible(boolean)}: it keeps running while hidden.
+   *
+   * <p>The value is only updated while the timer is attached. To keep a display updated while it
+   * is moved in and out of view, for instance inside tabs, attach the timer somewhere it stays
+   * attached and add only the display to the tab.
+   *
+   * @param display the component in which to show the value
+   * @return a handle that can be used for removing the display
+   */
+  public Registration addDisplay(Component display) {
+    Objects.requireNonNull(display, "display");
+    if (!displays.containsKey(display)) {
+      displays.put(display, display.addAttachListener(ev -> bindDisplay(display)));
+      bindDisplay(display);
+    }
+    return () -> removeDisplay(display);
+  }
+
+  private void removeDisplay(Component display) {
+    Registration attachRegistration = displays.remove(display);
+    if (attachRegistration == null) {
+      return;
+    }
+    attachRegistration.remove();
+    if (isAttached() && display.isAttached()) {
+      getElement().callJsFunction("_unbindDisplay", display.getElement());
+    }
+  }
+
+  private void bindDisplay(Component display) {
+    if (isAttached() && display.isAttached()) {
+      getElement().callJsFunction("_bindDisplay", display.getElement());
+    }
+  }
+
   @Override
   protected void onDetach(DetachEvent detachEvent) {
     super.onDetach(detachEvent);
@@ -319,6 +363,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
       end(true);
     }
     sync(true);
+    displays.keySet().forEach(this::bindDisplay);
   }
 
   private void onClientEnd() {
@@ -359,7 +404,9 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   /**
-   * Shows or hides the timer with CSS, so that it keeps communicating with the server while hidden.
+   * Shows or hides the timer with CSS, so that it keeps running and communicating with the server
+   * while hidden. A hidden timer still updates the components added with {@link
+   * #addDisplay(Component)}.
    *
    * @param visible whether to show the timer
    */

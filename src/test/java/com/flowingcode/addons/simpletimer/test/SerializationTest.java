@@ -20,11 +20,13 @@
 package com.flowingcode.addons.simpletimer.test;
 
 import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer;
+import com.vaadin.flow.component.html.Span;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
 import org.junit.Test;
 
 public class SerializationTest {
@@ -43,5 +45,15 @@ public class SerializationTest {
   @Test
   public void testSerialization() throws ClassNotFoundException, IOException {
     testSerializationOf(new SimpleTimer());
+  }
+
+  @Test
+  public void testSerializationOfRunningTimerWithDisplay()
+      throws ClassNotFoundException, IOException {
+    SimpleTimer timer = new SimpleTimer();
+    timer.setCountdown(Duration.ofSeconds(60));
+    timer.addDisplay(new Span());
+    timer.start();
+    testSerializationOf(timer);
   }
 }
