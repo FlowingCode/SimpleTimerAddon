@@ -20,6 +20,7 @@ To see the demo, navigate to http://localhost:8080/
 
 - **Version 1.0.0** Supports Vaadin 10-13 and Vaadin 14 in compatibility mode
 - **Version 2.0.0** Supports Vaadin 14 in npm mode
+- **Version 3.0.0** Keeps the timer state on the server, so the timer keeps counting while detached (e.g. inside tabs). Adds external displays and a detach policy. Removes the Polymer dependency. See [Migrating from 2.x](#migrating-from-2x).
 
 ## Issue tracking
 
@@ -67,16 +68,51 @@ Simple Timer Addon is written by Flowing Code S.A.
 ## Using the component
 
 - Basic usage
+```java
+SimpleTimer timer = new SimpleTimer();
+timer.setCountdown(Duration.ofSeconds(30)); // or timer.setCountUp(Duration.ofMinutes(5))
+timer.start();
+timer.pause();
+timer.reset();
+timer.isRunning();
+timer.getElapsed();
+timer.getRemaining();
 ```
-		SimpleTimer timer = new SimpleTimer(new BigDecimal("30"));
-		timer.start();
-		timer.pause();
-		timer.reset();
-		timer.setCountUp(true);
-		timer.isRunning();
-		
+
+- Timer ended listener
+```java
+timer.addTimerEndListener(ev -> Notification.show("Timer ended"));
 ```
-- Timer Ended listener
+
+- Showing the value inside other components
+
+  The browser updates each display on every frame, without round trips to the server. To show the value only in other components, hide the timer: it keeps running while hidden.
+```java
+timer.setVisible(false);
+timer.addDisplay(headerBadge);
+timer.addDisplay(tabContent);
 ```
-		timer.addTimerEndEvent(ev-> Notification.show("Timer ended"));
+
+- Server-side notifications while running
+
+  Each notification is a round trip, so pick the period the listener needs. To show the value, use `addDisplay` instead.
+```java
+timer.addTickListener(ev -> log(ev.getElapsed()), Duration.ofSeconds(1));
 ```
+
+## Detached timers
+
+The state of the timer is kept on the server, so a timer that is detached and attached again (for instance when it is inside a tab) keeps counting. To pause it while it is detached instead, use `timer.setDetachPolicy(DetachPolicy.PAUSE)`.
+
+If the timer reaches its limit while detached, the end listener is notified when the timer is attached again, and `isRetroactive()` returns `true`. A display added with `addDisplay` is only updated while the timer is attached, so keep the timer somewhere it stays attached and move only the display.
+
+A browser reload creates a new UI and a new timer. To keep the time across reloads, save `getElapsed()` and restore it with `setElapsed`, or use `@PreserveOnRefresh`.
+
+## Migrating from 2.x
+
+- `start()` no longer pauses a running timer. Use `pause()`.
+- `setStartTime(Number)` and `setEndTime(Number)` are deprecated in favor of `setCountdown(Duration)` and `setCountUp(Duration)`.
+- `getCurrentTime()` and `getCurrentTimeAsync()` are deprecated in favor of `getElapsed()` and `getRemaining()`, which are computed on the server without a round trip.
+- `addTimerEndEvent` is deprecated in favor of `addTimerEndListener`.
+- `addCurrentTimeChangeListener` is deprecated in favor of `addTickListener`.
+- The web component no longer depends on Polymer, and no longer exposes the `startTime`, `endTime`, `countUp` and `isRunning` properties, nor the `start`, `pause` and `ready` functions.
