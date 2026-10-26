@@ -169,6 +169,20 @@ public class SimpleTimerTest {
 
     assertTrue(timer.isRunning());
     assertEquals(s(4), timer.getElapsed());
+    assertTrue(ended.isEmpty());
+  }
+
+  @Test
+  public void longerLimitAfterLimitFiresEndOfPreviousRun() {
+    timer.setCountdown(s(60));
+    timer.start();
+    ComponentUtil.onComponentDetach(timer);
+    clock.advance(s(90));
+    timer.setCountdown(s(120));
+
+    assertEquals(1, ended.size());
+    assertFalse(timer.isRunning());
+    assertEquals(Duration.ZERO, timer.getElapsed());
   }
 
   @Test
@@ -218,6 +232,38 @@ public class SimpleTimerTest {
     ComponentUtil.onComponentAttach(timer, false);
     ComponentUtil.onComponentAttach(timer, false);
 
+    assertEquals(1, ended.size());
+  }
+
+  @Test
+  public void pauseAfterLimitWhileDetachedFiresEnd() {
+    timer.setCountdown(s(60));
+    timer.start();
+    ComponentUtil.onComponentDetach(timer);
+    clock.advance(s(90));
+    timer.pause();
+
+    assertEquals(1, ended.size());
+    assertTrue(ended.get(0).isRetroactive());
+    assertEquals(s(60), timer.getElapsed());
+
+    ComponentUtil.onComponentAttach(timer, false);
+    assertEquals(1, ended.size());
+  }
+
+  @Test
+  public void resetAfterLimitWhileDetachedFiresEndOnce() {
+    timer.setCountdown(s(60));
+    timer.start();
+    ComponentUtil.onComponentDetach(timer);
+    clock.advance(s(90));
+    timer.reset();
+
+    assertEquals(1, ended.size());
+    assertFalse(timer.isRunning());
+    assertEquals(Duration.ZERO, timer.getElapsed());
+
+    ComponentUtil.onComponentAttach(timer, false);
     assertEquals(1, ended.size());
   }
 

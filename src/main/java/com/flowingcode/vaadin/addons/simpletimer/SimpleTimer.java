@@ -128,6 +128,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     if (limit.isNegative()) {
       throw new IllegalArgumentException("limit must not be negative");
     }
+    // checked against the current limit, before it is replaced
+    endIfDue(!isAttached());
     boolean running = isRunning();
     this.limit = limit;
     this.countUp = countUp;
@@ -166,6 +168,10 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   /** Pauses the timer, keeping the elapsed time. Does nothing if it is not running. */
   public void pause() {
     pausedByDetach = false;
+    if (endIfDue(!isAttached())) {
+      sync(false);
+      return;
+    }
     if (startedAt == null) {
       return;
     }
@@ -216,6 +222,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    */
   public void setElapsed(Duration elapsed) {
     Objects.requireNonNull(elapsed, "elapsed");
+    // the run being replaced may have reached its limit without being notified yet
+    endIfDue(!isAttached());
     restart(elapsed, isRunning());
   }
 
@@ -380,9 +388,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     if (pausedByDetach) {
       start();
     }
-    if (startedAt != null && rawElapsed().compareTo(limit) >= 0) {
-      end(true);
-    }
+    endIfDue(true);
     sync(true);
     displays.keySet().forEach(this::bindDisplay);
   }
@@ -392,6 +398,22 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
       return;
     }
     end(false);
+  }
+
+  /**
+   * Ends the current run if it has reached its limit, so that a run is never left without its end
+   * event. The server does not end a run on its own: the client reports it, or the timer notices it
+   * when it is attached or its state is changed.
+   *
+   * @param retroactive whether the timer was detached when the run reached its limit
+   * @return {@code true} if the run was ended
+   */
+  private boolean endIfDue(boolean retroactive) {
+    if (startedAt == null || rawElapsed().compareTo(limit) < 0) {
+      return false;
+    }
+    end(retroactive);
+    return true;
   }
 
   private void end(boolean retroactive) {
