@@ -286,6 +286,27 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   }
 
   /**
+   * Adds a listener that is notified while the timer is running, at most once per period.
+   *
+   * <p>Each notification is a round trip from the browser, so use a period that matches what the
+   * listener needs. To show the value in another component, use {@link #addDisplay(Component)}
+   * instead, which needs no round trips.
+   *
+   * @param listener the listener to add
+   * @param period the minimum time between notifications
+   * @return a handle that can be used for removing the listener
+   */
+  public Registration addTickListener(
+      ComponentEventListener<TimerTickEvent> listener, Duration period) {
+    Objects.requireNonNull(listener, "listener");
+    int millis = (int) Math.min(period.toMillis(), Integer.MAX_VALUE);
+    return getElement()
+        .addEventListener(
+            "simple-timer-tick", ev -> listener.onComponentEvent(new TimerTickEvent(this, true)))
+        .throttle(millis);
+  }
+
+  /**
    * Sets what the timer does while it is detached. The default is {@link DetachPolicy#CONTINUE}.
    *
    * @param detachPolicy the policy to apply when the timer is detached
@@ -454,6 +475,38 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     }
   }
 
+  /** Event fired periodically while the timer is running. */
+  public static class TimerTickEvent extends ComponentEvent<SimpleTimer> {
+
+    /**
+     * Creates a new event.
+     *
+     * @param source the running timer
+     * @param fromClient whether the event originated from the client
+     */
+    public TimerTickEvent(final SimpleTimer source, final boolean fromClient) {
+      super(source, fromClient);
+    }
+
+    /**
+     * Returns the elapsed time, as computed on the server when this method is called.
+     *
+     * @return the value of {@link SimpleTimer#getElapsed()}
+     */
+    public Duration getElapsed() {
+      return getSource().getElapsed();
+    }
+
+    /**
+     * Returns the remaining time, as computed on the server when this method is called.
+     *
+     * @return the value of {@link SimpleTimer#getRemaining()}
+     */
+    public Duration getRemaining() {
+      return getSource().getRemaining();
+    }
+  }
+
   // ---- deprecated API ----
 
   /**
@@ -514,7 +567,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @param period the minimum period between listener invocations, or 0 to disable throttling
    * @param periodUnit time duration of throttling period
    * @return this registration, for chaining
-   * @deprecated The value is now available on the server through {@link #getElapsed()}.
+   * @deprecated Use {@link #addTickListener(ComponentEventListener, Duration)} instead. The value
+   *     itself is available on the server through {@link #getElapsed()}.
    */
   @Deprecated
   public Registration addCurrentTimeChangeListener(
