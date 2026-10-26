@@ -21,183 +21,151 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-//import '@polymer/polymer/polymer-legacy.js';
 
-import {Polymer} from '@polymer/polymer/lib/legacy/polymer-fn.js';
-import {html} from '@polymer/polymer/lib/utils/html-tag.js';
+const pad = n => (n < 10 ? '0' : '') + n;
 
-Polymer({
-	  _template: html`
-		<style>
-		  :host {
-			display: block;
-		  }
-		</style>
-		{{_formattedTime}}
-	  `,
+/**
+ * Formats a time value given in milliseconds, e.g. "1:02:03.45".
+ * Negative values are shown as zero. Fractions are truncated to hundredths.
+ */
+export function formatTime(millis, {fractions, minutes, hours, doubleDigitHours}) {
+  const ms = millis > 0 ? Math.floor(millis) : 0;
+  const showMinutes = minutes || hours;
+  let s = Math.floor(ms / 1000);
+  let m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  if (hours) m %= 60;
+  if (showMinutes) s %= 60;
 
-      is: 'simple-timer',
+  let text = '';
+  if (hours) text += (doubleDigitHours ? pad(h) : h) + ':';
+  if (showMinutes) text += pad(m) + ':';
+  text += pad(s);
+  if (fractions) text += '.' + pad(Math.floor((ms % 1000) / 10));
+  return text;
+}
 
-      properties: {
-        /**
-        * Start time for the timer in seconds
-        */
-        startTime: {
-          type: Number,
-          value: 0
-        },
-        /**
-        * End time for the timer in seconds
-        */
-        endTime: {
-          type: Number,
-          value: 0
-        },
-        /**
-        * Current time of the timer, in seconds
-        */
-        currentTime: {
-          type: Number,
-          notify: true
-        },
-        /**
-        * True if the timer is currently running
-        * @default false
-        */
-        isRunning: {
-          type: Boolean,
-          reflectToAttribute: true,
-          notify: true,
-          value: false
-        },
-        /**
-        * Set to true to have timer count up
-        * @default false
-        */
-        countUp: {
-          type: Boolean,
-          value: false
-        },
-        /**
-         * Set to false to hide fractional seconds
-         * @default true
-         */
-        fractions: {
-        	type: Boolean,
-        	value: true
-        },
-        /**
-         * Set to true to show minutes
-         * @default false
-         */
-        minutes: {
-        	type: Boolean,
-        	value: false
-        },
-        /**
-         * Set to true to show hours, and minutes
-         * @default false
-         */
-        hours: {
-        	type: Boolean,
-        	value: false
-        },
-        /**
-         * Use two digits for hours
-         * @default false
-         */
-        doubleDigitHours: {
-        	type: Boolean,
-        	value: false
-        },
-        /**
-        * Time the timer has spent running since it was started
-        */
-        _elapsedTime: {
-          type: Number,
-          value: 0
-        },
+const FORMAT_PROPERTIES = ['fractions', 'minutes', 'hours', 'doubleDigitHours'];
 
-        _formattedTime: {
-          type: String,
-          value: '0'
-        }
-      },
+/**
+ * Renders a timer whose state is owned by the server.
+ *
+ * The server pushes the elapsed time as a duration, never as an instant, because the server and
+ * browser clocks are not the same clock. The element anchors that duration to its own
+ * performance.now() when it arrives, and derives the current value on every frame.
+ */
+class SimpleTimer extends HTMLElement {
 
-      ready: function() {
-        if (this.countUp) {
-          this.set('currentTime', 0);
-        } else {
-          this.set('currentTime', this.startTime);
-        }
-        this.set('_formattedTime', this._formatTime(this.currentTime.toString()));
-      },
+  constructor() {
+    super();
+    this._fractions = true;
+    this._minutes = false;
+    this._hours = false;
+    this._doubleDigitHours = false;
 
-      start: function() {
-        if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.endTime && this.countUp) ) {
-          // timer is over
-          this.currentTime = this.countUp ? this.endTime : 0;
-          this._formattedTime = this._formatTime(this.currentTime);
-        }
-        
-        if (this.countUp && !this.endTime || !this.countUp && !this.startTime || this.isRunning) {
-          this.pause();
-          return;
-        }
-        this._elapsed = performance.now()/1000;
-        this.isRunning = true;
-        window.requestAnimationFrame(this._decreaseTimer.bind(this));
-      },
+    this._base = 0;       // elapsed milliseconds at _origin
+    this._origin = 0;     // performance.now() when _base was received
+    this._running = false;
+    this._limit = 0;
+    this._countUp = false;
+    this._raf = 0;
+    this._frame = this._frame.bind(this);
 
-      pause: function() {
-        this.isRunning = false;
-      },
+    this.attachShadow({mode: 'open'}).innerHTML = '<span part="value"></span>';
+    this._value = this.shadowRoot.firstChild;
+  }
 
-      _decreaseTimer: function(timestamp) {
-        if (!this.isRunning) {
-          return;
-        }
-        if ((this.currentTime <= 0 && !this.countUp) 
-            || (this.currentTime >= this.endTime && this.countUp) ) {
-          // timer is over
-          this.currentTime = this.countUp ? this.endTime : 0;
-          this._formattedTime = this._formatTime(this.currentTime);
-          this.pause();
-          this.fire('simple-timer-end');
-          return;
-        }
-
-        var now = timestamp/1000;
-        // Compute the relative progress based on the time spent running
-        var progress = now - this._elapsed;
-        this.currentTime = this.countUp ? this.currentTime + progress : this.currentTime - progress;
-        this._formattedTime = this._formatTime(this.currentTime);
-        this._elapsed = now;
-        window.requestAnimationFrame(this._decreaseTimer.bind(this));
-      },
-
-      _formatTime: function(time) {
-        var timeString = time.toString().split('.');
-        if (timeString[0].indexOf('-') === 0) {
-        	return 0;
-        }
-        if (timeString.length==1) {
-            timeString.push("00");
-        }
-        var seconds = timeString[0];
-        var minutes = seconds / 60 | 0;
-        var hours = minutes / 60 | 0;
-        
-        minutes = this.hours ? minutes % 60 : minutes;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        
-        seconds = this.minutes || this.hours ? seconds % 60 : seconds;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        
-        if(this.hours && this.doubleDigitHours) {
-			hours = hours.toString().padStart(2, '0');
-		}
-        return (this.hours ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') 
+  connectedCallback() {
+    // Flow may set properties before the element is upgraded; re-apply them through the setters.
+    FORMAT_PROPERTIES.forEach(name => {
+      if (Object.prototype.hasOwnProperty.call(this, name)) {
+        const value = this[name];
+        delete this[name];
+        this[name] = value;
       }
     });
+    this._render();
+    if (this._running) this._loop();
+  }
+
+  disconnectedCallback() {
+    cancelAnimationFrame(this._raf);
+    this._raf = 0;
+  }
+
+  /** The displayed value in seconds. Kept for the deprecated currentTime property listener. */
+  get currentTime() {
+    return this._displayed() / 1000;
+  }
+
+  /**
+   * Applies the clock state pushed by the server.
+   *
+   * When pull is set and the timer is running, the element asks for the state again. A push can be
+   * deferred while the element is hidden, which would leave a stale origin; the answer to the pull
+   * is computed when it is sent, so it always lands on the right time.
+   */
+  _sync(elapsed, running, limit, countUp, pull) {
+    this._base = elapsed;
+    this._origin = performance.now();
+    this._limit = limit;
+    this._countUp = countUp;
+    this._running = running;
+    this._render();
+    if (!running) return;
+    this._loop();
+    if (pull) this.dispatchEvent(new CustomEvent('simple-timer-sync-request'));
+  }
+
+  _elapsed() {
+    const elapsed = this._base + (this._running ? performance.now() - this._origin : 0);
+    return Math.min(elapsed, this._limit);
+  }
+
+  _displayed() {
+    const elapsed = this._elapsed();
+    return this._countUp ? elapsed : this._limit - elapsed;
+  }
+
+  _loop() {
+    if (!this._raf && this.isConnected) this._raf = requestAnimationFrame(this._frame);
+  }
+
+  _frame() {
+    this._raf = 0;
+    if (!this._running) return;
+    if (this._elapsed() >= this._limit) {
+      this._base = this._limit;
+      this._running = false;
+      this._render();
+      this._fire('simple-timer-end');
+      return;
+    }
+    this._render();
+    this.dispatchEvent(new CustomEvent('current-time-changed'));
+    this._loop();
+  }
+
+  _fire(type, detail) {
+    this.dispatchEvent(new CustomEvent(type, {bubbles: true, composed: true, detail}));
+  }
+
+  _render() {
+    const text = formatTime(this._displayed(), this);
+    if (this._value.textContent !== text) this._value.textContent = text;
+  }
+}
+
+FORMAT_PROPERTIES.forEach(name => {
+  Object.defineProperty(SimpleTimer.prototype, name, {
+    get() {
+      return this['_' + name];
+    },
+    set(value) {
+      this['_' + name] = !!value;
+      this._render();
+    },
+  });
+});
+
+customElements.define('simple-timer', SimpleTimer);
