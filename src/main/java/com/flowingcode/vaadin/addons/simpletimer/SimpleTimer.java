@@ -157,12 +157,18 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   /** Starts the timer. Does nothing if it is already running or has reached its limit. */
   public void start() {
     pausedByDetach = false;
+    if (startRun()) {
+      sync(true);
+    }
+  }
+
+  private boolean startRun() {
     if (startedAt != null || rawElapsed().compareTo(limit) >= 0) {
-      return;
+      return false;
     }
     startedAt = clock.instant();
     endNotified = false;
-    sync(true);
+    return true;
   }
 
   /** Pauses the timer, keeping the elapsed time. Does nothing if it is not running. */
@@ -175,9 +181,13 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     if (startedAt == null) {
       return;
     }
+    pauseRun();
+    sync(false);
+  }
+
+  private void pauseRun() {
     baseElapsed = getElapsed();
     startedAt = null;
-    sync(false);
   }
 
   /** Resets the elapsed time to zero. A running timer keeps running from the start. */
@@ -382,7 +392,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   protected void onDetach(DetachEvent detachEvent) {
     super.onDetach(detachEvent);
     if (detachPolicy == DetachPolicy.PAUSE && isRunning()) {
-      pause();
+      // no sync: the client element is being removed, and onAttach pushes the state
+      pauseRun();
       pausedByDetach = true;
     }
   }
@@ -391,7 +402,8 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
     if (pausedByDetach) {
-      start();
+      pausedByDetach = false;
+      startRun();
     }
     endIfDue(true);
     sync(true);
