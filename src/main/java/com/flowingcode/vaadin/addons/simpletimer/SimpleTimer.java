@@ -362,8 +362,13 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
       return;
     }
     attachRegistration.remove();
-    if (isAttached() && display.isAttached()) {
-      getElement().callJsFunction("_unbindDisplay", display.getElement());
+    if (display.isAttached()) {
+      // run from the display, so that the value is removed even if the timer is detached
+      display
+          .getElement()
+          .executeJs(
+              "const timer = customElements.get('simple-timer'); timer && timer._unbindDisplay($0)",
+              display.getElement());
     }
   }
 
