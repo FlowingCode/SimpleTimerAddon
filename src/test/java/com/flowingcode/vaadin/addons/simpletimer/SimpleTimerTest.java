@@ -224,6 +224,21 @@ public class SimpleTimerTest {
     assertEquals(s(60), timer.getElapsed());
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void tickListenerRejectsZeroPeriod() {
+    timer.addTickListener(ev -> {}, Duration.ZERO);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void tickListenerRejectsNegativePeriod() {
+    timer.addTickListener(ev -> {}, s(-1));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void tickListenerRejectsNullPeriod() {
+    timer.addTickListener(ev -> {}, null);
+  }
+
   @Test
   public void endFiresOnlyOnce() {
     timer.setCountdown(s(60));
