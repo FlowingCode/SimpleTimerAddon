@@ -21,6 +21,7 @@ package com.flowingcode.vaadin.addons.simpletimer;
 
 import static org.junit.Assert.assertEquals;
 
+import com.flowingcode.vaadin.addons.simpletimer.SimpleTimer.DetachPolicy;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.internal.PendingJavaScriptInvocation;
@@ -30,6 +31,7 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Duration;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,5 +106,19 @@ public class SimpleTimerClientCallsTest {
     registration.remove();
 
     assertEquals(1, count(flush(), "_unbindDisplay"));
+  }
+
+  @Test
+  public void resumingOnAttachSyncsOnce() {
+    timer.setDetachPolicy(DetachPolicy.PAUSE);
+    timer.setCountdown(Duration.ofSeconds(60));
+    ui.add(timer);
+    timer.start();
+    flush();
+
+    ui.remove(timer);
+    ui.add(timer);
+
+    assertEquals(1, count(flush(), "_sync"));
   }
 }
