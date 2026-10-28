@@ -313,10 +313,15 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * @param listener the listener to add
    * @param period the minimum time between notifications
    * @return a handle that can be used for removing the listener
+   * @throws IllegalArgumentException if {@code period} is zero or negative
    */
   public Registration addTickListener(
       ComponentEventListener<TimerTickEvent> listener, Duration period) {
     Objects.requireNonNull(listener, "listener");
+    Objects.requireNonNull(period, "period");
+    if (period.isZero() || period.isNegative()) {
+      throw new IllegalArgumentException("period must be positive");
+    }
     int millis = (int) Math.min(period.toMillis(), Integer.MAX_VALUE);
     return getElement()
         .addEventListener(
