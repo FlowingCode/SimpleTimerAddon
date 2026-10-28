@@ -359,6 +359,10 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
    * moved in and out of view, for instance inside tabs, attach the timer somewhere it stays
    * attached and add only the display to the tab.
    *
+   * <p>A component shows the value of one timer at a time: if it is added as a display to two
+   * timers, they overwrite each other's value. The timer keeps a reference to the component until
+   * the display is removed with the returned handle.
+   *
    * @param display the component in which to show the value
    * @return a handle that can be used for removing the display
    */
