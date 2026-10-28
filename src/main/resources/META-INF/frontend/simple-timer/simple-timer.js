@@ -143,12 +143,14 @@ class SimpleTimer extends HTMLElement {
     this._render();
   }
 
-  /** Stops writing the value into the given element, and removes the text written so far. */
-  _unbindDisplay(target) {
-    if (!target || !this._displays.delete(target)) return;
-    const node = displayNodes.get(target);
+  /**
+   * Removes the text written into the given element. Static, so that it works while no timer element
+   * exists; a timer still bound to the element drops it on its next render.
+   */
+  static _unbindDisplay(target) {
+    const node = target && displayNodes.get(target);
     if (node) node.remove();
-    displayNodes.delete(target);
+    if (target) displayNodes.delete(target);
   }
 
   _elapsed() {
