@@ -219,6 +219,7 @@ public class SimpleTimerTest {
 
     assertEquals(1, ended.size());
     assertTrue(ended.get(0).isRetroactive());
+    assertFalse(ended.get(0).isFromClient());
     assertFalse(timer.isRunning());
     assertEquals(s(60), timer.getElapsed());
   }
