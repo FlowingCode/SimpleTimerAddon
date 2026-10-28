@@ -414,7 +414,7 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     if (startedAt == null || rawElapsed().plus(END_TOLERANCE).compareTo(limit) < 0) {
       return;
     }
-    end(false);
+    end(false, true);
   }
 
   /**
@@ -429,18 +429,24 @@ public class SimpleTimer extends Component implements HasSize, HasStyle, Seriali
     if (startedAt == null || rawElapsed().compareTo(limit) < 0) {
       return false;
     }
-    end(retroactive);
+    end(retroactive, false);
     return true;
   }
 
-  private void end(boolean retroactive) {
+  /**
+   * Ends the current run.
+   *
+   * @param retroactive whether the timer was detached when the run reached its limit
+   * @param fromClient whether the client reported the end, as it always did before 3.0
+   */
+  private void end(boolean retroactive, boolean fromClient) {
     baseElapsed = limit;
     startedAt = null;
     if (endNotified) {
       return;
     }
     endNotified = true;
-    fireEvent(new TimerEndedEvent(this, false, retroactive));
+    fireEvent(new TimerEndedEvent(this, fromClient, retroactive));
   }
 
   private void sync(boolean pull) {
