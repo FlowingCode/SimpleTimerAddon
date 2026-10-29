@@ -33,6 +33,7 @@ public class SimpletimerDemoView extends TabbedDemo {
 
   public SimpletimerDemoView() {
     addDemo(SimpletimerDemo.class);
+    addDemo(SimpletimerTabsDemo.class);
     setSizeFull();
   }
 }
