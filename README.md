@@ -9,7 +9,7 @@ Simple Timer for Vaadin 10+ based on https://github.com/annsonn/simple-timer
 
 ## Online demo
 
-[Online demo here](http://addonsv14.flowingcode.com/simple-timer)
+[Online demo here](http://addonsv24.flowingcode.com/simple-timer)
 
 ## Building and running demo
 
