@@ -11,6 +11,32 @@ Simple Timer for Vaadin 10+ based on https://github.com/annsonn/simple-timer
 
 [Online demo here](http://addonsv24.flowingcode.com/simple-timer)
 
+## Download release
+
+[Available in Vaadin Directory](https://vaadin.com/directory/component/simple-timer-addon)
+
+### Maven install
+
+Add the following dependencies in your pom.xml file:
+
+```xml
+<dependency>
+   <groupId>com.flowingcode.addons</groupId>
+   <artifactId>simple-timer</artifactId>
+   <version>X.Y.Z</version>
+</dependency>
+```
+<!-- the above dependency should be updated with latest released version information -->
+
+```xml
+<repository>
+   <id>vaadin-addons</id>
+   <url>https://maven.vaadin.com/vaadin-addons</url>
+</repository>
+```
+
+For SNAPSHOT versions see [here](https://maven.flowingcode.com/snapshots/).
+
 ## Building and running demo
 
 - git clone repository
@@ -118,3 +144,15 @@ A browser reload creates a new UI and a new timer. To keep the time across reloa
 - `addTimerEndEvent` is deprecated in favor of `addTimerEndListener`.
 - `addCurrentTimeChangeListener` is deprecated in favor of `addTickListener`.
 - The web component no longer depends on Polymer, and no longer exposes the `startTime`, `endTime`, `countUp` and `isRunning` properties, nor the `start`, `pause` and `ready` functions.
+
+## Special configuration when using Spring
+
+By default, Vaadin Flow only includes `com/vaadin/flow/component` to be always scanned for UI components and views. For this reason, the add-on might need to be allowed in order to display correctly. 
+
+To do so, just add `com.flowingcode` to the `vaadin.allowed-packages` property in `src/main/resources/application.properties`, like:
+
+```
+vaadin.allowed-packages = com.vaadin,org.vaadin,dev.hilla,com.flowingcode
+```
+ 
+More information on Spring scanning configuration [here](https://vaadin.com/docs/latest/integrations/spring/configuration/#configure-the-scanning-of-packages).
