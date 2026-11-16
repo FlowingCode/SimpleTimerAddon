@@ -91,9 +91,18 @@ public class SimpleTimerClientCallsTest {
   }
 
   private static long count(List<PendingJavaScriptInvocation> calls, String function) {
-    return calls.stream()
-        .filter(call -> call.getInvocation().getExpression().contains(function))
-        .count();
+    return calls.stream().filter(call -> calls(call, function)).count();
+  }
+
+  /**
+   * Whether the call invokes the named client function. Up to Vaadin 25.3, {@code callJsFunction}
+   * sends an expression that names the function ({@code return $0._sync($1,...)}). Since 25.4 it
+   * sends one shared expression for all functions, with the function name as the first parameter.
+   */
+  private static boolean calls(PendingJavaScriptInvocation call, String function) {
+    List<?> parameters = call.getInvocation().getParameters();
+    return call.getInvocation().getExpression().contains(function)
+        || (!parameters.isEmpty() && function.equals(parameters.get(0)));
   }
 
   @Test
