@@ -1,11 +1,23 @@
 [![Published on Vaadin Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/simple-timer-addon)
 [![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/simple-timer-addon.svg)](https://vaadin.com/directory/component/simple-timer-addon)
 [![Build Status](https://jenkins.flowingcode.com/job/SimpleTimer-14-addon/badge/icon)](https://jenkins.flowingcode.com/job/SimpleTimer-14-addon)
+[![Vaadin Directory](https://img.shields.io/vaadin-directory/v/simple-timer-addon)](https://vaadin.com/directory/component/simple-timer-addon)
 [![Javadoc](https://img.shields.io/badge/javadoc-00b4f0)](https://javadoc.flowingcode.com/artifact/com.flowingcode.addons/simple-timer)
 
 # Simple Timer Addon
 
 Simple Timer for Vaadin 10+ based on https://github.com/annsonn/simple-timer
+
+## Features
+
+* Countdown from a given duration, or count up to a limit
+* Start, pause and reset the timer from the server
+* Elapsed and remaining time are available on the server without a round trip
+* Listener notified when the timer ends
+* Server-side tick listener with a configurable period
+* Show the value in other components, updated in the browser on every frame
+* Timer state is kept on the server, so it keeps counting while detached (configurable detach policy)
+* Optional display of minutes and hours
 
 ## Online demo
 
@@ -46,9 +58,7 @@ To see the demo, navigate to http://localhost:8080/
 
 ## Release notes
 
-- **Version 1.0.0** Supports Vaadin 10-13 and Vaadin 14 in compatibility mode
-- **Version 2.0.0** Supports Vaadin 14 in npm mode
-- **Version 3.0.0** Keeps the timer state on the server, so the timer keeps counting while detached (e.g. inside tabs). Adds external displays and a detach policy. Removes the Polymer dependency. See [Migrating from 2.x](#migrating-from-2x).
+See [here](https://github.com/FlowingCode/SimpleTimerAddon/releases)
 
 ## Issue tracking
 
